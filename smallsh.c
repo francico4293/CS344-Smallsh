@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 struct command {
 	char* pathName;
@@ -118,6 +120,25 @@ struct command* parseUserInput(char* userInput) {
 	return command;
 }
 
+void executeCommand(struct command* command) {
+	int childStatus;
+	pid_t spawnPid;
+
+	spawnPid = fork();
+	if (spawnPid == -1) {
+		perror("fork");
+		exit(1);
+	}
+	else if (spawnPid == 0) {
+		execv(command->pathName, command->argv);
+		perror("execv");
+		exit(1);
+	}
+	else {
+		spawnPid = waitpid(spawnPid, &childStatus, 0);
+	}
+}
+
 int main(void) {
 	char* userInput = NULL;
 	struct command* command = NULL;
@@ -128,20 +149,7 @@ int main(void) {
 		if (!command) {
 			continue;
 		}
-
-		printf("Command struct:\n");
-		printf("Path name = %s\n", command->pathName);
-		printf("Argv: ");
-		int index = 0;
-		while (command->argv[index]) {
-			printf("%s ", command->argv[index]);
-			index++;
-		}
-		printf("\n");
-		printf("Input redirection? %i\n", command->inputRedirect);
-		printf("New input = %s\n", command->newInput);
-		printf("Output redirection? %i\n", command->outputRedirect);
-		printf("New output = %s\n", command->newOutput);
+		executeCommand(command);
 	}
 
 	return EXIT_SUCCESS;
