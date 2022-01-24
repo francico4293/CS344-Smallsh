@@ -55,7 +55,7 @@ char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	argv[argvIndex] = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	strcpy(argv[argvIndex], arg);
 
-	while (index <= numArgs) {
+	while (index < numArgs) {
 		newArgv[index] = argv[index];
 		index++;
 	}
@@ -89,25 +89,31 @@ struct command* parseUserInput(char* userInput) {
 	while (token) {
 		if (strcmp(token, "<") == 0) {
 			command->inputRedirect = true;
+
+			token = strtok_r(NULL, " ", &savePtr);
+			command->newInput = (char*)malloc((strlen(token) + 1) * sizeof(char));
+
+			strcpy(command->newInput, token);
 		}
 		else if (strcmp(token, ">") == 0) {
 			command->outputRedirect = true;
+
+			token = strtok_r(NULL, " ", &savePtr);
+			command->newOutput = (char*)malloc((strlen(token) + 1) * sizeof(char));
+
+			strcpy(command->newOutput, token);
 		}
 		else if (strcmp(token, "&") == 0) {
 			command->backgroundProcess = true;
 		}
-
-		command->argv = appendArg(token, command->argv, numArgs, argvIndex);
-		argvIndex++;
-		numArgs++;
+		else {
+			command->argv = appendArg(token, command->argv, numArgs, argvIndex);
+			argvIndex++;
+			numArgs++;
+		}
 
 		token = strtok_r(NULL, " ", &savePtr);
 	}
-
-	for (int index = 0; index < numArgs; index++) {
-		printf("%s ", command->argv[index]);
-	}
-	printf("\n");
 
 	return command;
 }
@@ -122,6 +128,20 @@ int main(void) {
 		if (!command) {
 			continue;
 		}
+
+		printf("Command struct:\n");
+		printf("Path name = %s\n", command->pathName);
+		printf("Argv: ");
+		int index = 0;
+		while (command->argv[index]) {
+			printf("%s ", command->argv[index]);
+			index++;
+		}
+		printf("\n");
+		printf("Input redirection? %i\n", command->inputRedirect);
+		printf("New input = %s\n", command->newInput);
+		printf("Output redirection? %i\n", command->outputRedirect);
+		printf("New output = %s\n", command->newOutput);
 	}
 
 	return EXIT_SUCCESS;
