@@ -54,26 +54,63 @@ void initializeCommandStruct(struct command* command, int numArgs) {
 }
 
 void parseArg(char* arg) {
+	int index;
 	char* startToken = arg;
 	char* endToken = NULL;
+	char* finalExpandedArg = NULL;
+	char* currExpandedArg = NULL;
+	char* temp = NULL;
+	int pidLength = snprintf(NULL, 0, "%d", getpid());
+	char* pidString = (char*)malloc((pidLength + 1) * sizeof(char));
+	
+	sprintf(pidString, "%d", getpid());
 
 	endToken = strstr(startToken, "$$");
 	while (endToken) {
-		while (startToken < endToken) {
-			printf("%c", *startToken);
-			startToken++;
+		currExpandedArg = (char*)malloc((pidLength + (endToken - startToken) + 1) * sizeof(char));
+
+		if (startToken == endToken) {
+			strcpy(currExpandedArg, pidString);
 		}
-		printf("%d", getpid());
+		else {
+			index = 0;
+			while (startToken < endToken) {
+				currExpandedArg[index] = *startToken;
+				startToken++;
+				index++;
+			}
+			strcat(currExpandedArg, pidString);
+		}
+		
+		if (!finalExpandedArg) {
+			finalExpandedArg = (char*)malloc((strlen(currExpandedArg) + 1) * sizeof(char));
+			strcpy(finalExpandedArg, currExpandedArg);
+
+			free(currExpandedArg);
+			currExpandedArg = NULL;
+		}
+		else {
+			temp = finalExpandedArg;
+			finalExpandedArg = (char*)malloc((strlen(finalExpandedArg) + strlen(currExpandedArg) + 1) * sizeof(char));
+			strcpy(finalExpandedArg, temp);
+			strcat(finalExpandedArg, currExpandedArg);
+
+			free(currExpandedArg);
+			currExpandedArg = NULL;
+
+			free(temp);
+			temp = NULL;
+		}
 
 		startToken = startToken + 2;
 		endToken = strstr(startToken, "$$");
 	}
 
-	while (*startToken) {
-		printf("%c", *startToken);
-		startToken++;
+	// need to add something to handle possible string after a final $$ here
+
+	if (finalExpandedArg) {
+		printf("%s\n", finalExpandedArg);
 	}
-	printf("\n");
 }
 
 char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
