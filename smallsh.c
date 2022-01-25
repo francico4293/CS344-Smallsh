@@ -24,13 +24,16 @@ char* getCommandLineInput(void) {
 	char* userInput = NULL;
 	char* inputBuffer = NULL;
 	size_t length;
+	ssize_t nread;
 
 	printf(": ");
-	getline(&inputBuffer, &length, stdin);
+	nread = getline(&inputBuffer, &length, stdin);
 	*(inputBuffer + strlen(inputBuffer) - 1) = '\0';
 
 	userInput = (char*)malloc((strlen(inputBuffer) + 1) * sizeof(char));
 	strcpy(userInput, inputBuffer);
+
+	free(inputBuffer);
 
 	return userInput;
 }
@@ -72,11 +75,14 @@ struct command* parseUserInput(char* userInput) {
 	int argvIndex = 0;
 	char* token = NULL;
 	char* savePtr = NULL;
+	char* userInputCopy = (char*)malloc((strlen(userInput) + 1) * sizeof(char));
 	struct command* command = (struct command*)malloc(sizeof(struct command));
+
+	strcpy(userInputCopy, userInput);
 
 	initializeCommandStruct(command, numArgs);
 
-	token = strtok_r(userInput, " ", &savePtr);
+	token = strtok_r(userInputCopy, " ", &savePtr);
 	if (!token || (strcmp(token, "#") == 0)) {
 		return NULL;
 	}
@@ -117,6 +123,9 @@ struct command* parseUserInput(char* userInput) {
 		token = strtok_r(NULL, " ", &savePtr);
 	}
 
+	free(userInput);
+	free(userInputCopy);
+
 	return command;
 }
 
@@ -139,18 +148,48 @@ void executeCommand(struct command* command) {
 	}
 }
 
+void cleanupMemory(struct command* command) {
+	int index = 0;
+
+	while (command->argv[index]) {
+		free(command->argv[index]);
+		index++;
+	}
+	free(command->argv);
+
+	if (command->newInput) {
+		free(command->newInput);
+	}
+
+	if (command->newOutput) {
+		free(command->newOutput);
+	}
+
+	free(command);
+}
+
 int main(void) {
 	char* userInput = NULL;
 	struct command* command = NULL;
 
 	while (true) {
 		userInput = getCommandLineInput();
+		if (strcmp(userInput, "exit") == 0) {
+			break;
+		}
+
 		command = parseUserInput(userInput);
+
 		if (!command) {
 			continue;
 		}
+
 		executeCommand(command);
+
+		cleanupMemory(command);
 	}
+
+	free(userInput);
 
 	return EXIT_SUCCESS;
 }
