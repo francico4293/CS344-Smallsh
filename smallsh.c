@@ -53,9 +53,36 @@ void initializeCommandStruct(struct command* command, int numArgs) {
 	}
 }
 
+void parseArg(char* arg) {
+	char* startToken = arg;
+	char* endToken = NULL;
+
+	endToken = strstr(startToken, "$$");
+	while (endToken) {
+		while (startToken < endToken) {
+			printf("%c", *startToken);
+			startToken++;
+		}
+		printf("%d", getpid());
+
+		startToken = startToken + 2;
+		endToken = strstr(startToken, "$$");
+	}
+
+	while (*startToken) {
+		printf("%c", *startToken);
+		startToken++;
+	}
+	printf("\n");
+}
+
 char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	int index = 0;
+	char* argCopy = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	char** newArgv = (char**)malloc((numArgs + 1) * sizeof(char*));
+
+	strcpy(argCopy, arg);
+	parseArg(argCopy);
 
 	argv[argvIndex] = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	strcpy(argv[argvIndex], arg);
