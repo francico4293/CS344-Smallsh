@@ -117,6 +117,15 @@ struct command* parseUserInput(char* userInput) {
 		else if (strcmp(token, "&") == 0) {
 			command->backgroundProcess = true;
 		}
+		else if (strcmp(token, "$$") == 0) {
+			int pidLength = snprintf(NULL, 0, "%d", getpid());
+			char* pidString = (char*)malloc((pidLength + 1) * sizeof(char));
+			sprintf(pidString, "%d", getpid());
+			
+			command->argv = appendArg(pidString, command->argv, numArgs, argvIndex);
+			argvIndex++;
+			numArgs++;
+		}
 		else {
 			command->argv = appendArg(token, command->argv, numArgs, argvIndex);
 			argvIndex++;
