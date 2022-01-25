@@ -80,12 +80,15 @@ struct command* parseUserInput(char* userInput) {
 
 	strcpy(userInputCopy, userInput);
 
-	initializeCommandStruct(command, numArgs);
-
 	token = strtok_r(userInputCopy, " ", &savePtr);
 	if (!token || (strcmp(token, "#") == 0)) {
+		free(userInputCopy);
+		free(command);
 		return NULL;
 	}
+
+	initializeCommandStruct(command, numArgs);
+
 	command->pathName = (char*)malloc((strlen(token) + strlen("/bin/") + 1) * sizeof(char));
 	strcpy(command->pathName, "/bin/");
 	strcat(command->pathName, token);
@@ -174,6 +177,7 @@ int main(void) {
 
 	while (true) {
 		userInput = getCommandLineInput();
+		// remove this later
 		if (strcmp(userInput, "exit") == 0) {
 			break;
 		}
@@ -181,6 +185,7 @@ int main(void) {
 		command = parseUserInput(userInput);
 
 		if (!command) {
+			free(userInput);
 			continue;
 		}
 
