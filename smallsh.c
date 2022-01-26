@@ -227,21 +227,35 @@ void executeCommand(struct command* command) {
 	int childStatus;
 	pid_t spawnPid;
 	int savedOut;
+	int savedIn;
 
 	if (command->inputRedirect) {
-		printf("Redirect input\n");
-	}
+		savedIn = dup(STDIN_FILENO);
 
-	if (command->outputRedirect) {
-		int savedOut = dup(1);
-		int destinationFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-		if (destinationFD == -1) {
+		int targetInFD = open(command->newInput, O_RDONLY);
+		if (targetInFD == -1) {
 			perror("open");
 			exit(1);
 		}
 
-		int result = dup2(destinationFD, 1);
-		if (result == -1) {
+		int inResult = dup2(targetInFD, STDIN_FILENO);
+		if (inResult == -1) {
+			perror("dup2");
+			exit(1);
+		}
+	}
+
+	if (command->outputRedirect) {
+		savedOut = dup(STDOUT_FILENO);
+
+		int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+		if (targetOutFD == -1) {
+			perror("open");
+			exit(1);
+		}
+
+		int outResult = dup2(targetOutFD, STDOUT_FILENO);
+		if (outResult == -1) {
 			perror("dup2");
 			exit(1);
 		}
@@ -259,7 +273,8 @@ void executeCommand(struct command* command) {
 	}
 	else {
 		spawnPid = waitpid(spawnPid, &childStatus, 0);
-		dup2(savedOut, 1);
+		dup2(savedOut, STDOUT_FILENO);
+		dup2(savedIn, STDIN_FILENO);
 	}
 }
 
