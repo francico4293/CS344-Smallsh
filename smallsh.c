@@ -53,7 +53,7 @@ void initializeCommandStruct(struct command* command, int numArgs) {
 	}
 }
 
-void parseArg(char* arg) {
+char* parseArg(char* arg) {
 	int index;
 	char* startToken = arg;
 	char* endToken = NULL;
@@ -79,6 +79,7 @@ void parseArg(char* arg) {
 				startToken++;
 				index++;
 			}
+			currExpandedArg[index] = '\0';
 			strcat(currExpandedArg, pidString);
 		}
 		
@@ -106,11 +107,39 @@ void parseArg(char* arg) {
 		endToken = strstr(startToken, "$$");
 	}
 
-	// need to add something to handle possible string after a final $$ here
+	if (strlen(startToken) > 0) {
+		currExpandedArg = (char*)malloc((strlen(startToken) + 1) * sizeof(char));
 
-	if (finalExpandedArg) {
-		printf("%s\n", finalExpandedArg);
+		index = 0;
+		while (*startToken) {
+			currExpandedArg[index] = *startToken;
+			startToken++;
+			index++;
+		}
+		currExpandedArg[index] = '\0';
+
+		if (!finalExpandedArg) {
+			finalExpandedArg = (char*)malloc((strlen(currExpandedArg) + 1) * sizeof(char));
+			strcpy(finalExpandedArg, currExpandedArg);
+
+			free(currExpandedArg);
+			currExpandedArg = NULL;
+		}
+		else {
+			temp = finalExpandedArg;
+			finalExpandedArg = (char*)malloc((strlen(finalExpandedArg) + strlen(currExpandedArg) + 1) * sizeof(char));
+			strcpy(finalExpandedArg, temp);
+			strcat(finalExpandedArg, currExpandedArg);
+
+			free(currExpandedArg);
+			currExpandedArg = NULL;
+
+			free(temp);
+			temp = NULL;
+		}
 	}
+
+	return finalExpandedArg;
 }
 
 char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
@@ -119,7 +148,10 @@ char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	char** newArgv = (char**)malloc((numArgs + 1) * sizeof(char*));
 
 	strcpy(argCopy, arg);
-	parseArg(argCopy);
+	arg = parseArg(arg);
+
+	free(argCopy);
+	argCopy = NULL;
 
 	argv[argvIndex] = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	strcpy(argv[argvIndex], arg);
