@@ -53,6 +53,45 @@ void initializeCommandStruct(struct command* command, int numArgs) {
 	}
 }
 
+char* populateCurrExpandedArg(char* currExpandedArg, char* startToken, char* endToken) {
+	int index = 0;
+
+	while (*startToken && startToken < endToken) {
+		currExpandedArg[index] = *startToken;
+		startToken++;
+		index++;
+	}
+	currExpandedArg[index] = '\0';
+
+	return startToken;
+}
+
+char* updateFinalExpandedArg(char* finalExpandedArg, char* currExpandedArg) {
+	char* temp = NULL;
+
+	if (!finalExpandedArg) {
+		finalExpandedArg = (char*)malloc((strlen(currExpandedArg) + 1) * sizeof(char));
+		strcpy(finalExpandedArg, currExpandedArg);
+
+		free(currExpandedArg);
+		currExpandedArg = NULL;
+	}
+	else {
+		temp = finalExpandedArg;
+		finalExpandedArg = (char*)malloc((strlen(finalExpandedArg) + strlen(currExpandedArg) + 1) * sizeof(char));
+		strcpy(finalExpandedArg, temp);
+		strcat(finalExpandedArg, currExpandedArg);
+
+		free(currExpandedArg);
+		currExpandedArg = NULL;
+
+		free(temp);
+		temp = NULL;
+	}
+
+	return finalExpandedArg;
+}
+
 char* parseArg(char* arg) {
 	int index;
 	char* startToken = arg;
@@ -73,35 +112,11 @@ char* parseArg(char* arg) {
 			strcpy(currExpandedArg, pidString);
 		}
 		else {
-			index = 0;
-			while (startToken < endToken) {
-				currExpandedArg[index] = *startToken;
-				startToken++;
-				index++;
-			}
-			currExpandedArg[index] = '\0';
+			startToken = populateCurrExpandedArg(currExpandedArg, startToken, endToken);
 			strcat(currExpandedArg, pidString);
 		}
 		
-		if (!finalExpandedArg) {
-			finalExpandedArg = (char*)malloc((strlen(currExpandedArg) + 1) * sizeof(char));
-			strcpy(finalExpandedArg, currExpandedArg);
-
-			free(currExpandedArg);
-			currExpandedArg = NULL;
-		}
-		else {
-			temp = finalExpandedArg;
-			finalExpandedArg = (char*)malloc((strlen(finalExpandedArg) + strlen(currExpandedArg) + 1) * sizeof(char));
-			strcpy(finalExpandedArg, temp);
-			strcat(finalExpandedArg, currExpandedArg);
-
-			free(currExpandedArg);
-			currExpandedArg = NULL;
-
-			free(temp);
-			temp = NULL;
-		}
+		finalExpandedArg = updateFinalExpandedArg(finalExpandedArg, currExpandedArg);
 
 		startToken = startToken + 2;
 		endToken = strstr(startToken, "$$");
@@ -110,33 +125,9 @@ char* parseArg(char* arg) {
 	if (strlen(startToken) > 0) {
 		currExpandedArg = (char*)malloc((strlen(startToken) + 1) * sizeof(char));
 
-		index = 0;
-		while (*startToken) {
-			currExpandedArg[index] = *startToken;
-			startToken++;
-			index++;
-		}
-		currExpandedArg[index] = '\0';
+		startToken = populateCurrExpandedArg(currExpandedArg, startToken, arg + strlen(arg));
 
-		if (!finalExpandedArg) {
-			finalExpandedArg = (char*)malloc((strlen(currExpandedArg) + 1) * sizeof(char));
-			strcpy(finalExpandedArg, currExpandedArg);
-
-			free(currExpandedArg);
-			currExpandedArg = NULL;
-		}
-		else {
-			temp = finalExpandedArg;
-			finalExpandedArg = (char*)malloc((strlen(finalExpandedArg) + strlen(currExpandedArg) + 1) * sizeof(char));
-			strcpy(finalExpandedArg, temp);
-			strcat(finalExpandedArg, currExpandedArg);
-
-			free(currExpandedArg);
-			currExpandedArg = NULL;
-
-			free(temp);
-			temp = NULL;
-		}
+		finalExpandedArg = updateFinalExpandedArg(finalExpandedArg, currExpandedArg);
 	}
 
 	free(pidString);
