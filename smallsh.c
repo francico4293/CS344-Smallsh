@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 struct command {
 	char* pathName;
@@ -225,6 +226,26 @@ struct command* parseUserInput(char* userInput) {
 void executeCommand(struct command* command) {
 	int childStatus;
 	pid_t spawnPid;
+	int savedOut;
+
+	if (command->inputRedirect) {
+		printf("Redirect input\n");
+	}
+
+	if (command->outputRedirect) {
+		int savedOut = dup(1);
+		int destinationFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+		if (destinationFD == -1) {
+			perror("open");
+			exit(1);
+		}
+
+		int result = dup2(destinationFD, 1);
+		if (result == -1) {
+			perror("dup2");
+			exit(1);
+		}
+	}
 
 	spawnPid = fork();
 	if (spawnPid == -1) {
@@ -238,6 +259,7 @@ void executeCommand(struct command* command) {
 	}
 	else {
 		spawnPid = waitpid(spawnPid, &childStatus, 0);
+		dup2(savedOut, 1);
 	}
 }
 
