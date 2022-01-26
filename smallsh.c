@@ -139,19 +139,17 @@ char* parseArg(char* arg) {
 		}
 	}
 
+	free(pidString);
+	pidString = NULL;
+
 	return finalExpandedArg;
 }
 
 char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	int index = 0;
-	char* argCopy = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	char** newArgv = (char**)malloc((numArgs + 1) * sizeof(char*));
 
-	strcpy(argCopy, arg);
 	arg = parseArg(arg);
-
-	free(argCopy);
-	argCopy = NULL;
 
 	argv[argvIndex] = (char*)malloc((strlen(arg) + 1) * sizeof(char));
 	strcpy(argv[argvIndex], arg);
@@ -162,7 +160,12 @@ char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	}
 	newArgv[index] = NULL;
 
+	free(arg);
+	arg = NULL;
+
 	free(argv);
+	argv = NULL;
+
 	return newArgv;
 }
 
@@ -212,15 +215,6 @@ struct command* parseUserInput(char* userInput) {
 		}
 		else if (strcmp(token, "&") == 0) {
 			command->backgroundProcess = true;
-		}
-		else if (strcmp(token, "$$") == 0) {
-			int pidLength = snprintf(NULL, 0, "%d", getpid());
-			char* pidString = (char*)malloc((pidLength + 1) * sizeof(char));
-			sprintf(pidString, "%d", getpid());
-			
-			command->argv = appendArg(pidString, command->argv, numArgs, argvIndex);
-			argvIndex++;
-			numArgs++;
 		}
 		else {
 			command->argv = appendArg(token, command->argv, numArgs, argvIndex);
