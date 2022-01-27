@@ -223,15 +223,6 @@ struct command* parseUserInput(char* userInput) {
 	return command;
 }
 
-void appendPid(struct dynamicArray* backgroundPids, int pid) {
-	if ((float)(backgroundPids->size + 1) / (float)(backgroundPids->capacity) >= 0.75) {
-
-	}
-
-	backgroundPids->staticArray[backgroundPids->size] = pid;
-	backgroundPids->size++;
-}
-
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids) {
 	int childStatus;
 	pid_t spawnPid;
@@ -292,17 +283,21 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			dup2(savedIn, STDIN_FILENO);
 		}
 		else {
-			appendPid(backgroundPids, spawnPid);
+			append(backgroundPids, spawnPid);
 		}
 	}
 }
 
-void showOpenPids(struct dynamicArray* backgroundPids) {
-	printf("Open PIDS: ");
+void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
+	int backgroundPid;
+	int backgroundPidStatus;
+
 	for (int index = 0; index < backgroundPids->size; index++) {
-		printf("%d ", backgroundPids->staticArray[index]);
+		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) != 0) {
+			printf("background pid %d is done\n", backgroundPids->staticArray[index]);
+			delete(backgroundPids, index);
+		}
 	}
-	printf("\n");
 }
 
 void cleanupMemory(struct command* command) {
@@ -331,7 +326,7 @@ int main(void) {
 	struct dynamicArray* backgroundPids = newDynamicArray();
 
 	while (true) {
-		showOpenPids(backgroundPids);
+		terminateBackgroundProcesses(backgroundPids);
 		userInput = getCommandLineInput();
 		// remove this later
 		if (strcmp(userInput, "exit") == 0) {
