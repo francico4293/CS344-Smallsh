@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include "dynamicArray.h"
 
 struct command {
 	char* pathName;
@@ -222,11 +223,24 @@ struct command* parseUserInput(char* userInput) {
 	return command;
 }
 
-void executeCommand(struct command* command) {
+void appendPid(struct dynamicArray* backgroundPids, int pid) {
+	if ((float)(backgroundPids->size + 1) / (float)(backgroundPids->capacity) >= 0.75) {
+
+	}
+
+	backgroundPids->staticArray[backgroundPids->size] = pid;
+	backgroundPids->size++;
+}
+
+void executeCommand(struct command* command, struct dynamicArray* backgroundPids) {
 	int childStatus;
 	pid_t spawnPid;
 	int savedOut;
 	int savedIn;
+
+	if (command->backgroundProcess) {
+		printf("Run me in the background\n");
+	}
 
 	if (command->inputRedirect) {
 		savedIn = dup(STDIN_FILENO);
@@ -266,16 +280,29 @@ void executeCommand(struct command* command) {
 		exit(1);
 	}
 	else if (spawnPid == 0) {
-		//execv(command->pathName, command->argv);
 		execvp(command->pathName, command->argv);
-		perror("execv");
+		printf("%s: No such file or directory\n", command->pathName);
+		fflush(stdout);
 		exit(1);
 	}
 	else {
-		spawnPid = waitpid(spawnPid, &childStatus, 0);
-		dup2(savedOut, STDOUT_FILENO);
-		dup2(savedIn, STDIN_FILENO);
+		if (!command->backgroundProcess) {
+			spawnPid = waitpid(spawnPid, &childStatus, 0);
+			dup2(savedOut, STDOUT_FILENO);
+			dup2(savedIn, STDIN_FILENO);
+		}
+		else {
+			appendPid(backgroundPids, spawnPid);
+		}
 	}
+}
+
+void showOpenPids(struct dynamicArray* backgroundPids) {
+	printf("Open PIDS: ");
+	for (int index = 0; index < backgroundPids->size; index++) {
+		printf("%d ", backgroundPids->staticArray[index]);
+	}
+	printf("\n");
 }
 
 void cleanupMemory(struct command* command) {
@@ -301,8 +328,10 @@ void cleanupMemory(struct command* command) {
 int main(void) {
 	char* userInput = NULL;
 	struct command* command = NULL;
+	struct dynamicArray* backgroundPids = newDynamicArray();
 
 	while (true) {
+		showOpenPids(backgroundPids);
 		userInput = getCommandLineInput();
 		// remove this later
 		if (strcmp(userInput, "exit") == 0) {
@@ -316,7 +345,7 @@ int main(void) {
 			continue;
 		}
 
-		executeCommand(command);
+		executeCommand(command, backgroundPids);
 
 		cleanupMemory(command);
 	}

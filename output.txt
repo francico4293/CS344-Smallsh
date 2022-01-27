@@ -1,3 +1,0 @@
-output.txt
-smallsh
-smallsh.c
