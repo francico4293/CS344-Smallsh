@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 #include "dynamicArray.h"
 #include "parser.h"
 
@@ -19,6 +20,31 @@ void status(int exitStatus) {
 	}
 	else {
 		printf("terminated by signal %d\n", WTERMSIG(exitStatus));
+	}
+}
+
+void changeDirectory(struct command* command) {
+	char currentWorkingDir[PATH_MAX];
+	char* home = getenv("HOME");
+
+	if (!command->argv[1]) {
+		chdir(home);
+		return;
+	}
+
+	getcwd(currentWorkingDir, PATH_MAX);
+	if (strncmp(command->argv[1], home, strlen(home)) == 0) {
+		chdir(command->argv[1]);
+	}
+	else {
+		char* path = (char*)malloc((strlen(currentWorkingDir) + strlen("/") + strlen(command->argv[1]) + 1) * sizeof(char));
+
+		strcpy(path, currentWorkingDir);
+		strcat(path, "/");
+		strcat(path, command->argv[1]);
+		chdir(path);
+
+		free(path);
 	}
 }
 
@@ -66,6 +92,11 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 
 	if (strcmp(command->argv[0], "status") == 0) {
 		status(*lastStatus);
+		return;
+	}
+
+	if (strcmp(command->argv[0], "cd") == 0) {
+		changeDirectory(command);
 		return;
 	}
 
