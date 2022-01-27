@@ -180,9 +180,8 @@ struct command* parseUserInput(char* userInput) {
 
 	initializeCommandStruct(command, numArgs);
 
-	command->pathName = (char*)malloc((strlen(token) + strlen("/bin/") + 1) * sizeof(char));
-	strcpy(command->pathName, "/bin/");
-	strcat(command->pathName, token);
+	command->pathName = (char*)malloc((strlen(token) + 1) * sizeof(char));
+	strcpy(command->pathName, token);
 
 	command->argv[argvIndex] = command->pathName;
 	argvIndex++;
@@ -267,7 +266,8 @@ void executeCommand(struct command* command) {
 		exit(1);
 	}
 	else if (spawnPid == 0) {
-		execv(command->pathName, command->argv);
+		//execv(command->pathName, command->argv);
+		execvp(command->pathName, command->argv);
 		perror("execv");
 		exit(1);
 	}
