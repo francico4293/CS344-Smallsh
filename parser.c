@@ -1,16 +1,13 @@
 /*
 * Author: Colin Francis
 * ONID: francico
-* Title: Smallsh
+* Description: Functions used for command line parsing
 */
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
+#include <stdio.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include "dynamicArray.h"
+#include <stdbool.h>
 
 struct command {
 	char* pathName;
@@ -103,7 +100,7 @@ char* parseArg(char* arg) {
 	char* temp = NULL;
 	int pidLength = snprintf(NULL, 0, "%d", getpid());
 	char* pidString = (char*)malloc((pidLength + 1) * sizeof(char));
-	
+
 	sprintf(pidString, "%d", getpid());
 
 	endToken = strstr(startToken, "$$");
@@ -117,7 +114,7 @@ char* parseArg(char* arg) {
 			startToken = populateCurrExpandedArg(currExpandedArg, startToken, endToken);
 			strcat(currExpandedArg, pidString);
 		}
-		
+
 		finalExpandedArg = updateFinalExpandedArg(finalExpandedArg, currExpandedArg);
 
 		startToken = startToken + 2;
@@ -221,151 +218,4 @@ struct command* parseUserInput(char* userInput) {
 	free(userInputCopy);
 
 	return command;
-}
-
-void executeCommand(struct command* command, struct dynamicArray* backgroundPids) {
-	int childStatus;
-	pid_t spawnPid;
-	bool restoreOut = false;
-	int savedOut;
-	bool restoreIn = false;
-	int savedIn;
-
-	if (command->inputRedirect) {
-		savedIn = dup(STDIN_FILENO);
-		restoreIn = true;
-
-		int targetInFD = open(command->newInput, O_RDONLY);
-		if (targetInFD == -1) {
-			perror("open");
-			exit(1);
-		}
-
-		int inResult = dup2(targetInFD, STDIN_FILENO);
-		if (inResult == -1) {
-			perror("dup2");
-			exit(1);
-		}
-	}
-
-	if (command->outputRedirect) {
-		savedOut = dup(STDOUT_FILENO);
-		restoreOut = true;
-
-		int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-		if (targetOutFD == -1) {
-			perror("open");
-			exit(1);
-		}
-
-		int outResult = dup2(targetOutFD, STDOUT_FILENO);
-		if (outResult == -1) {
-			perror("dup2");
-			exit(1);
-		}
-	}
-
-	spawnPid = fork();
-	if (spawnPid == -1) {
-		perror("fork");
-		exit(1);
-	}
-	else if (spawnPid == 0) {
-		execvp(command->pathName, command->argv);
-		printf("%s: No such file or directory\n", command->pathName);
-		fflush(stdout);
-		exit(1);
-	}
-	else {
-		if (!command->backgroundProcess) {
-			spawnPid = waitpid(spawnPid, &childStatus, 0);
-
-			if (restoreOut) {
-				dup2(savedOut, STDOUT_FILENO);
-			}
-			
-			if (restoreIn) {
-				dup2(savedIn, STDIN_FILENO);
-			}
-		}
-		else {
-			printf("background pid is %d\n", spawnPid);
-			fflush(stdout);
-			append(backgroundPids, spawnPid);
-		}
-	}
-}
-
-void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
-	int backgroundPid;
-	int backgroundPidStatus;
-
-	for (int index = 0; index < backgroundPids->size; index++) {
-		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) != 0) {
-			printf("background pid %d is done: ", backgroundPids->staticArray[index]);
-			fflush(stdout);
-
-			if (WIFEXITED(backgroundPidStatus)) {
-				printf("exit value %d\n", WEXITSTATUS(backgroundPidStatus));
-			}
-			else {
-				printf("terminated by signal %d\n", WTERMSIG(backgroundPidStatus));
-			}
-
-			delete(backgroundPids, index);
-		}
-	}
-}
-
-void cleanupMemory(struct command* command) {
-	int index = 0;
-
-	while (command->argv[index]) {
-		free(command->argv[index]);
-		index++;
-	}
-	free(command->argv);
-
-	if (command->newInput) {
-		free(command->newInput);
-	}
-
-	if (command->newOutput) {
-		free(command->newOutput);
-	}
-
-	free(command);
-}
-
-int main(void) {
-	char* userInput = NULL;
-	struct command* command = NULL;
-	struct dynamicArray* backgroundPids = newDynamicArray();
-
-	while (true) {
-		terminateBackgroundProcesses(backgroundPids);
-		userInput = getCommandLineInput();
-
-		// remove this later
-		if (strcmp(userInput, "exit") == 0) {
-			break;
-		}
-
-		command = parseUserInput(userInput);
-
-		if (!command) {
-			free(userInput);
-			continue;
-		}
-
-		executeCommand(command, backgroundPids);
-
-		cleanupMemory(command);
-	}
-
-	free(userInput);
-	free(backgroundPids->staticArray);
-	free(backgroundPids);
-
-	return EXIT_SUCCESS;
 }
