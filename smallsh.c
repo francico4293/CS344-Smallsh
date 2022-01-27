@@ -226,15 +226,14 @@ struct command* parseUserInput(char* userInput) {
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids) {
 	int childStatus;
 	pid_t spawnPid;
+	bool restoreOut = false;
 	int savedOut;
+	bool restoreIn = false;
 	int savedIn;
-
-	if (command->backgroundProcess) {
-		printf("Run me in the background\n");
-	}
 
 	if (command->inputRedirect) {
 		savedIn = dup(STDIN_FILENO);
+		restoreIn = true;
 
 		int targetInFD = open(command->newInput, O_RDONLY);
 		if (targetInFD == -1) {
@@ -251,6 +250,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 
 	if (command->outputRedirect) {
 		savedOut = dup(STDOUT_FILENO);
+		restoreOut = true;
 
 		int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 		if (targetOutFD == -1) {
@@ -279,10 +279,18 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	else {
 		if (!command->backgroundProcess) {
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
-			dup2(savedOut, STDOUT_FILENO);
-			dup2(savedIn, STDIN_FILENO);
+
+			if (restoreOut) {
+				dup2(savedOut, STDOUT_FILENO);
+			}
+			
+			if (restoreIn) {
+				dup2(savedIn, STDIN_FILENO);
+			}
 		}
 		else {
+			printf("background pid is %d\n", spawnPid);
+			fflush(stdout);
 			append(backgroundPids, spawnPid);
 		}
 	}
@@ -294,7 +302,16 @@ void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
 
 	for (int index = 0; index < backgroundPids->size; index++) {
 		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) != 0) {
-			printf("background pid %d is done\n", backgroundPids->staticArray[index]);
+			printf("background pid %d is done: ", backgroundPids->staticArray[index]);
+			fflush(stdout);
+
+			if (WIFEXITED(backgroundPidStatus)) {
+				printf("exit value %d\n", WEXITSTATUS(backgroundPidStatus));
+			}
+			else {
+				printf("terminated by signal %d\n", WTERMSIG(backgroundPidStatus));
+			}
+
 			delete(backgroundPids, index);
 		}
 	}
@@ -328,6 +345,7 @@ int main(void) {
 	while (true) {
 		terminateBackgroundProcesses(backgroundPids);
 		userInput = getCommandLineInput();
+
 		// remove this later
 		if (strcmp(userInput, "exit") == 0) {
 			break;
@@ -346,6 +364,8 @@ int main(void) {
 	}
 
 	free(userInput);
+	free(backgroundPids->staticArray);
+	free(backgroundPids);
 
 	return EXIT_SUCCESS;
 }
