@@ -173,7 +173,7 @@ struct command* parseUserInput(char* userInput) {
 	strcpy(userInputCopy, userInput);
 
 	token = strtok_r(userInputCopy, " ", &savePtr);
-	if (!token || (strcmp(token, "#") == 0)) {
+	if (!token || (*token == '#')) {
 		free(userInputCopy);
 		free(command);
 		return NULL;
