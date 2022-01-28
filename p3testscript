@@ -60,6 +60,12 @@ sleep 100 &
 echo
 echo
 echo --------------------
+echo pkill -signal SIGTERM sleep (10 points for pid of killed process, 10 points for signal)
+echo (Ignore message about Operation Not Permitted)
+pkill sleep
+echo
+echo
+echo --------------------
 echo sleep 1 background (10 pts for pid of bg ps when done, 10 for exit value)
 sleep 1 &
 sleep 1
@@ -93,6 +99,5 @@ echo
 echo --------------------
 echo pwd (5 points for being in the newly created dir)
 pwd
-echo --------------------
 exit
 ___EOF___
