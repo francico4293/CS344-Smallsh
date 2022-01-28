@@ -115,14 +115,6 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	int savedOut;
 	bool restoreIn = false;
 	int savedIn;
-
-	if (command->inputRedirect || command->backgroundProcess) {
-		redirectInput(command, &savedIn, &restoreIn);
-	}
-
-	if (command->outputRedirect || command->backgroundProcess) {
-		redirectOutput(command, &savedOut, &restoreOut);
-	}
 	
 	if (strcmp(command->argv[0], "status") == 0) {
 		status(*lastStatus);
@@ -140,7 +132,17 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		exit(1);
 	}
 	else if (spawnPid == 0) {
+		if (command->inputRedirect || command->backgroundProcess) {
+			redirectInput(command, &savedIn, &restoreIn);
+		}
+
+		if (command->outputRedirect || command->backgroundProcess) {
+			redirectOutput(command, &savedOut, &restoreOut);
+		}
+
 		execvp(command->pathName, command->argv);
+
+		restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		printf("%s: No such file or directory\n", command->pathName);
 		fflush(stdout);
 		exit(1);
@@ -149,11 +151,9 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		if (!command->backgroundProcess) {
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			*lastStatus = childStatus;
-			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		}
 		else {
 			append(backgroundPids, spawnPid);
-			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 			printf("background pid is %d\n", spawnPid);
 			fflush(stdout);
 		}
