@@ -11,8 +11,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
+#include <signal.h>
 #include "dynamicArray.h"
 #include "parser.h"
+#include "signals.h"
 
 void status(int exitStatus) {
 	if (WIFEXITED(exitStatus)) {
@@ -140,6 +142,10 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			redirectOutput(command, &savedOut, &restoreOut);
 		}
 
+		if (!command->backgroundProcess) {
+			signal(SIGINT, SIG_DFL);
+		}
+		
 		execvp(command->pathName, command->argv);
 
 		restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);

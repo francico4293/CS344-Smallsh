@@ -10,9 +10,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <signal.h>
 #include "dynamicArray.h"
 #include "parser.h"
 #include "commandExecution.h"
+#include "signals.h"
 
 void cleanupMemory(struct command* command) {
 	int index = 0;
@@ -39,6 +41,9 @@ int main(void) {
 	char* userInput = NULL;
 	struct command* command = NULL;
 	struct dynamicArray* backgroundPids = newDynamicArray();
+	struct sigaction ignoreAction = { 0 };
+
+	register_ignoreAction(&ignoreAction);
 
 	while (true) {
 		terminateBackgroundProcesses(backgroundPids);
