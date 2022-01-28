@@ -6,6 +6,8 @@
 
 void status(int exitStatus);
 
+void changeDirectory(struct command* command);
+
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus);
 
 void terminateBackgroundProcesses(struct dynamicArray* backgroundPids);

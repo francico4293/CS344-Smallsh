@@ -1,0 +1,20 @@
+total 848
+drwx------.  4 francico upg19446   466 Jan 27 18:42 .
+drwxrwx---. 42 francico upg19446  1131 Jan 26 09:53 ..
+-rwxrwx---.  1  1002584 upg19446  3725 Jan 27 18:40 commandExecution.c
+-rwxrwx---.  1  1002584 upg19446   387 Jan 27 13:51 commandExecution.h
+-rwx------.  1 francico upg19446    12 Jan 27 18:41 count.txt
+-rwxrwx---.  1  1002584 upg19446  1519 Jan 26 21:07 dynamicArray.c
+-rwxrwx---.  1  1002584 upg19446   406 Jan 26 20:42 dynamicArray.h
+drwx------.  8 francico upg19446   270 Jan 27 13:49 .git
+-rwx------.  1 francico upg19446     8 Jan 24 11:39 .gitignore
+-rwx------.  1 francico upg19446     0 Jan 27 18:42 in.txt
+-rwx------.  1 francico upg19446   138 Jan 27 18:27 junk
+-rwx------.  1 francico upg19446    12 Jan 27 18:27 junk2
+-rwxrwx---.  1  1002584 upg19446  1321 Jan 27 13:43 main.c
+drwx------.  2 francico upg19446     0 Jan 27 13:31 newDir8771
+-rwx------.  1 francico upg19446   144 Jan 27 18:41 out.txt
+-rwxrwx---.  1  1002584 upg19446  2251 Jan 24 08:16 p3testscript
+-rwxrwx---.  1  1002584 upg19446  5416 Jan 27 11:08 parser.c
+-rwxrwx---.  1  1002584 upg19446   717 Jan 27 11:08 parser.h
+-rwx--x---.  1 francico upg19446 18736 Jan 27 18:41 smallsh

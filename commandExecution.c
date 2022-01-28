@@ -48,6 +48,50 @@ void changeDirectory(struct command* command) {
 	}
 }
 
+void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
+	*savedIn = dup(STDIN_FILENO);
+	*restoreIn = true;
+
+	int targetInFD = open(command->newInput, O_RDONLY);
+	if (targetInFD == -1) {
+		perror("open");
+		exit(1);
+	}
+
+	int inResult = dup2(targetInFD, STDIN_FILENO);
+	if (inResult == -1) {
+		perror("dup2");
+		exit(1);
+	}
+}
+
+void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
+	*savedOut = dup(STDOUT_FILENO);
+	*restoreOut = true;
+
+	int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	if (targetOutFD == -1) {
+		perror("open");
+		exit(1);
+	}
+
+	int outResult = dup2(targetOutFD, STDOUT_FILENO);
+	if (outResult == -1) {
+		perror("dup2");
+		exit(1);
+	}
+}
+
+void restoreIOStreams(bool restoreIn, int savedIn, bool restoreOut, int savedOut) {
+	if (restoreOut) {
+		dup2(savedOut, STDOUT_FILENO);
+	}
+
+	if (restoreIn) {
+		dup2(savedIn, STDIN_FILENO);
+	}
+}
+
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus) {
 	int childStatus;
 	pid_t spawnPid;
@@ -57,37 +101,11 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	int savedIn;
 
 	if (command->inputRedirect) {
-		savedIn = dup(STDIN_FILENO);
-		restoreIn = true;
-
-		int targetInFD = open(command->newInput, O_RDONLY);
-		if (targetInFD == -1) {
-			perror("open");
-			exit(1);
-		}
-
-		int inResult = dup2(targetInFD, STDIN_FILENO);
-		if (inResult == -1) {
-			perror("dup2");
-			exit(1);
-		}
+		redirectInput(command, &savedIn, &restoreIn);
 	}
 
 	if (command->outputRedirect) {
-		savedOut = dup(STDOUT_FILENO);
-		restoreOut = true;
-
-		int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-		if (targetOutFD == -1) {
-			perror("open");
-			exit(1);
-		}
-
-		int outResult = dup2(targetOutFD, STDOUT_FILENO);
-		if (outResult == -1) {
-			perror("dup2");
-			exit(1);
-		}
+		redirectOutput(command, &savedOut, &restoreOut);
 	}
 
 	if (strcmp(command->argv[0], "status") == 0) {
@@ -116,18 +134,14 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			*lastStatus = childStatus;
 
-			if (restoreOut) {
-				dup2(savedOut, STDOUT_FILENO);
-			}
-
-			if (restoreIn) {
-				dup2(savedIn, STDIN_FILENO);
-			}
+			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		}
 		else {
 			printf("background pid is %d\n", spawnPid);
 			fflush(stdout);
 			append(backgroundPids, spawnPid);
+
+			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		}
 	}
 }
