@@ -99,5 +99,6 @@ echo
 echo --------------------
 echo pwd (5 points for being in the newly created dir)
 pwd
+echo --------------------
 exit
 ___EOF___

@@ -28,6 +28,7 @@ char* getCommandLineInput(void) {
 	printf(": ");
 	nread = getline(&inputBuffer, &length, stdin);
 	*(inputBuffer + strlen(inputBuffer) - 1) = '\0';
+	fflush(stdout);
 
 	userInput = (char*)malloc((strlen(inputBuffer) + 1) * sizeof(char));
 	strcpy(userInput, inputBuffer);

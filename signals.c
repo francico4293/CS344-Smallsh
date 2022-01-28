@@ -8,10 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void register_ignoreAction(struct sigaction* ignoreAction) {
+void fill_ignoreAction(struct sigaction* ignoreAction) {
 	ignoreAction->sa_handler = SIG_IGN;
 	ignoreAction->sa_flags = SA_RESTART;
 	sigfillset(&(ignoreAction->sa_mask));
-
-	sigaction(SIGINT, ignoreAction, NULL);
 }

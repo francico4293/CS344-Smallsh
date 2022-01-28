@@ -19,9 +19,11 @@
 void status(int exitStatus) {
 	if (WIFEXITED(exitStatus)) {
 		printf("exit value %d\n", WEXITSTATUS(exitStatus));
+		fflush(stdout);
 	}
 	else {
 		printf("terminated by signal %d\n", WTERMSIG(exitStatus));
+		fflush(stdout);
 	}
 }
 
@@ -64,7 +66,8 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 	}
 
 	if (targetInFD == -1) {
-		perror("open");
+		printf("%s: No such file or directory\n", command->newInput);
+		fflush(stdout);
 		exit(1);
 	}
 
@@ -128,6 +131,10 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		return;
 	}
 
+	if (strcmp(command->argv[0], "exit") == 0) {
+		exit(0);
+	}
+
 	spawnPid = fork();
 	if (spawnPid == -1) {
 		perror("fork");
@@ -145,7 +152,6 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		if (!command->backgroundProcess) {
 			signal(SIGINT, SIG_DFL);
 		}
-		
 		execvp(command->pathName, command->argv);
 
 		restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
@@ -160,6 +166,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 
 			if (WIFSIGNALED(childStatus) && WTERMSIG(childStatus) == 2) {
 				printf("terminated by signal %d\n", WTERMSIG(childStatus));
+				fflush(stdout);
 			}
 		}
 		else {

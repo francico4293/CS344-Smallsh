@@ -4,4 +4,4 @@
 * Description: Header file for signal handling functions
 */
 
-void register_ignoreAction(struct sigaction* ignoreAction);
+void fill_ignoreAction(struct sigaction* ignoreAction);

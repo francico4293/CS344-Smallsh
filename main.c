@@ -43,16 +43,13 @@ int main(void) {
 	struct dynamicArray* backgroundPids = newDynamicArray();
 	struct sigaction ignoreAction = { 0 };
 
-	register_ignoreAction(&ignoreAction);
+	fill_ignoreAction(&ignoreAction);
+	sigaction(SIGINT, &ignoreAction, NULL);
 
 	while (true) {
 		terminateBackgroundProcesses(backgroundPids);
-		userInput = getCommandLineInput();
 
-		// remove this later
-		if (strcmp(userInput, "exit") == 0) {
-			break;
-		}
+		userInput = getCommandLineInput();
 
 		command = parseUserInput(userInput);
 
