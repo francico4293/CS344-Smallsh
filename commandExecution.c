@@ -49,10 +49,18 @@ void changeDirectory(struct command* command) {
 }
 
 void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
+	int targetInFD;
+
 	*savedIn = dup(STDIN_FILENO);
 	*restoreIn = true;
 
-	int targetInFD = open(command->newInput, O_RDONLY);
+	if (command->inputRedirect) {
+		targetInFD = open(command->newInput, O_RDONLY);
+	}
+	else {
+		targetInFD = open("/dev/null", O_RDONLY);
+	}
+
 	if (targetInFD == -1) {
 		perror("open");
 		exit(1);
@@ -66,10 +74,18 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 }
 
 void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
+	int targetOutFD;
+
 	*savedOut = dup(STDOUT_FILENO);
 	*restoreOut = true;
 
-	int targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	if (command->outputRedirect) {
+		targetOutFD = open(command->newOutput, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	}
+	else {
+		targetOutFD = open("/dev/null", O_WRONLY);
+	}
+	
 	if (targetOutFD == -1) {
 		perror("open");
 		exit(1);
@@ -100,14 +116,14 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	bool restoreIn = false;
 	int savedIn;
 
-	if (command->inputRedirect) {
+	if (command->inputRedirect || command->backgroundProcess) {
 		redirectInput(command, &savedIn, &restoreIn);
 	}
 
-	if (command->outputRedirect) {
+	if (command->outputRedirect || command->backgroundProcess) {
 		redirectOutput(command, &savedOut, &restoreOut);
 	}
-
+	
 	if (strcmp(command->argv[0], "status") == 0) {
 		status(*lastStatus);
 		return;
@@ -133,15 +149,13 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		if (!command->backgroundProcess) {
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			*lastStatus = childStatus;
-
 			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		}
 		else {
+			append(backgroundPids, spawnPid);
+			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 			printf("background pid is %d\n", spawnPid);
 			fflush(stdout);
-			append(backgroundPids, spawnPid);
-
-			restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
 		}
 	}
 }
