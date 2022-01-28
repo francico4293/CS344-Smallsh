@@ -157,6 +157,10 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		if (!command->backgroundProcess) {
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			*lastStatus = childStatus;
+
+			if (WIFSIGNALED(childStatus) && WTERMSIG(childStatus) == 2) {
+				printf("terminated by signal %d\n", WTERMSIG(childStatus));
+			}
 		}
 		else {
 			append(backgroundPids, spawnPid);
