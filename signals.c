@@ -30,8 +30,8 @@ void fill_SIGTSTP_action(struct sigaction* SIGTSTP_action) {
 	sigdelset(&(SIGTSTP_action->sa_mask), SIGINT);
 }
 
-void fill_ignoreAction(struct sigaction* ignoreAction) {
-	ignoreAction->sa_handler = SIG_IGN;
-	ignoreAction->sa_flags = SA_RESTART;
-	sigfillset(&(ignoreAction->sa_mask));
+void fill_ignore_action(struct sigaction* ignore_action) {
+	ignore_action->sa_handler = SIG_IGN;
+	ignore_action->sa_flags = SA_RESTART;
+	sigfillset(&(ignore_action->sa_mask));
 }

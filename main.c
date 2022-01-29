@@ -24,10 +24,10 @@ int main(void) {
 	char* userInput = NULL;
 	struct command* command = NULL;
 	struct dynamicArray* backgroundPids = newDynamicArray();
-	struct sigaction ignoreAction = { 0 }, SIGTSTP_action = { 0 };
+	struct sigaction ignore_action = { 0 }, SIGTSTP_action = { 0 };
 
-	fill_ignoreAction(&ignoreAction);
-	sigaction(SIGINT, &ignoreAction, NULL);
+	fill_ignore_action(&ignore_action);
+	sigaction(SIGINT, &ignore_action, NULL);
 
 	fill_SIGTSTP_action(&SIGTSTP_action);
 	sigaction(SIGTSTP, &SIGTSTP_action, NULL);

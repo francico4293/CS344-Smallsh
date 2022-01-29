@@ -191,17 +191,23 @@ struct command* parseUserInput(char* userInput) {
 			command->inputRedirect = true;
 
 			token = strtok_r(NULL, " ", &savePtr);
+			token = parseArg(token);
 			command->newInput = (char*)malloc((strlen(token) + 1) * sizeof(char));
 
 			strcpy(command->newInput, token);
+
+			free(token);
 		}
 		else if (strcmp(token, ">") == 0) {
 			command->outputRedirect = true;
 
 			token = strtok_r(NULL, " ", &savePtr);
+			token = parseArg(token);
 			command->newOutput = (char*)malloc((strlen(token) + 1) * sizeof(char));
 
 			strcpy(command->newOutput, token);
+
+			free(token);
 		}
 		else if (strcmp(token, "&") == 0) {
 			command->backgroundProcess = true;

@@ -156,9 +156,9 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			signal(SIGINT, SIG_DFL);
 		}
 
-		struct sigaction ignoreAction = { 0 };
-		fill_ignoreAction(&ignoreAction);
-		sigaction(SIGTSTP, &ignoreAction, NULL);
+		struct sigaction ignore_action = { 0 };
+		fill_ignore_action(&ignore_action);
+		sigaction(SIGTSTP, &ignore_action, NULL);
 
 		execvp(command->pathName, command->argv);
 
