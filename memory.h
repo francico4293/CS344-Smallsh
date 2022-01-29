@@ -5,3 +5,5 @@
 */
 
 void cleanupMemory(struct command* command);
+
+void cleanupMemoryAndExit(struct command* command, struct dynamicArray* backgroundPids);

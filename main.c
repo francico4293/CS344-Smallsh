@@ -1,7 +1,7 @@
 /*
 * Author: Colin Francis
 * ONID: francico
-* Descrtiption: Driver code and memory management for smallsh program
+* Descrtiption: Driver code for smallsh program
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,10 +50,6 @@ int main(void) {
 
 		cleanupMemory(command);
 	}
-
-	// free(userInput);
-	// free(backgroundPids->staticArray);
-	// free(backgroundPids);
 
 	return EXIT_SUCCESS;
 }

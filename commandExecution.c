@@ -134,12 +134,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	}
 
 	if (strcmp(command->argv[0], "exit") == 0) {
-		cleanupMemory(command);
-
-		// close open Pids
-
-		free(backgroundPids->staticArray);
-		free(backgroundPids);
+		cleanupMemoryAndExit(command, backgroundPids);
 		exit(0);
 	}
 
@@ -191,7 +186,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 }
 
 void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
-	int backgroundPid;
+	pid_t backgroundPid;
 	int backgroundPidStatus;
 
 	for (int index = 0; index < backgroundPids->size; index++) {

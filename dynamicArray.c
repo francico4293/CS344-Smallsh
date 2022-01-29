@@ -12,7 +12,7 @@ struct dynamicArray {
 };
 
 void upsizeArray(struct dynamicArray* dynArr) {
-	int* newStaticArray = (int*)malloc((dynArr->capacity * 2) + sizeof(int));
+	int* newStaticArray = (int*)calloc((dynArr->capacity * 2), sizeof(int));
 
 	for (int index = 0; index < dynArr->size; index++) {
 		newStaticArray[index] = dynArr->staticArray[index];
@@ -26,7 +26,7 @@ void upsizeArray(struct dynamicArray* dynArr) {
 
 void delete(struct dynamicArray* dynArr, int indexToDelete) {
 	int newIndex = 0;
-	int* newStaticArray = (int*)malloc(dynArr->capacity * sizeof(int));
+	int* newStaticArray = (int*)calloc((dynArr->capacity * 2), sizeof(int));
 
 	for (int index = 0; index < dynArr->size; index++) {
 		if (index == indexToDelete) {
@@ -53,7 +53,7 @@ void append(struct dynamicArray* dynArr, int value) {
 }
 
 struct dynamicArray* newDynamicArray(void) {
-	struct dynamicArray* dynArr = (struct dynamicArray*)malloc(sizeof(struct dynamicArray));
+	struct dynamicArray* dynArr = (struct dynamicArray*)calloc(1, sizeof(struct dynamicArray));
 
 	dynArr->size = 0;
 	dynArr->capacity = 5;
