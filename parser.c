@@ -163,6 +163,8 @@ char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 struct command* parseUserInput(char* userInput) {
 	int numArgs = 2;
 	int argvIndex = 0;
+	char* lastToken = NULL;
+	int lastTokenIndex = 0;
 	char* token = NULL;
 	char* savePtr = NULL;
 	char* userInputCopy = (char*)malloc((strlen(userInput) + 1) * sizeof(char));
@@ -187,6 +189,16 @@ struct command* parseUserInput(char* userInput) {
 
 	token = strtok_r(NULL, " ", &savePtr);
 	while (token) {
+		if (strcmp(token, " ") != 0) {
+			if (lastToken) {
+				free(lastToken);
+			}
+
+			lastToken = (char*)malloc((strlen(token) + 1) * sizeof(char));
+			lastTokenIndex = argvIndex;
+			strcpy(lastToken, token);
+		}
+
 		if (strcmp(token, "<") == 0) {
 			command->inputRedirect = true;
 
@@ -209,9 +221,6 @@ struct command* parseUserInput(char* userInput) {
 
 			free(token);
 		}
-		else if (strcmp(token, "&") == 0) {
-			command->backgroundProcess = true;
-		}
 		else {
 			command->argv = appendArg(token, command->argv, numArgs, argvIndex);
 			argvIndex++;
@@ -219,6 +228,15 @@ struct command* parseUserInput(char* userInput) {
 		}
 
 		token = strtok_r(NULL, " ", &savePtr);
+	}
+
+	if (lastToken && strcmp(lastToken, "&") == 0) {
+		command->backgroundProcess = true;
+		command->argv[lastTokenIndex] = NULL;
+		free(lastToken);
+	}
+	else if (lastToken) {
+		free(lastToken);
 	}
 
 	free(userInput);

@@ -1,0 +1,25 @@
+total 1128
+drwx------.  3 francico upg19446   622 Jan 29 15:56 .
+drwxrwx---. 42 francico upg19446  1131 Jan 26 09:53 ..
+-rwxrwx---.  1  1002584 upg19446    69 Jan 28 21:22 CITATIONS.txt
+-rwxrwx---.  1  1002584 upg19446  4755 Jan 29 13:15 commandExecution.c
+-rwxrwx---.  1  1002584 upg19446   634 Jan 28 23:52 commandExecution.h
+-rwxrwx---.  1  1002584 upg19446  1526 Jan 29 12:24 dynamicArray.c
+-rwxrwx---.  1  1002584 upg19446   406 Jan 26 20:42 dynamicArray.h
+drwx------.  8 francico upg19446   270 Jan 29 13:33 .git
+-rwx------.  1 francico upg19446     8 Jan 24 11:39 .gitignore
+-rwxrwx---.  1  1002584 upg19446   259 Jan 29 11:50 globalVariables.c
+-rwxrwx---.  1  1002584 upg19446   250 Jan 29 11:50 globalVariables.h
+-rwx------.  1 francico upg19446   224 Jan 29 15:42 junk
+-rwx------.  1 francico upg19446    12 Jan 29 15:42 junk2
+-rwxrwx---.  1  1002584 upg19446  1197 Jan 29 14:14 main.c
+-rwxrwx---.  1  1002584 upg19446  1133 Jan 29 10:34 memory.c
+-rwxrwx---.  1  1002584 upg19446   263 Jan 29 10:28 memory.h
+-rwx------.  1 francico upg19446     0 Jan 29 15:56 out.txt
+-rwxrwx---.  1  1002584 upg19446  2251 Jan 29 15:18 p3testscript
+-rwxrwx---.  1  1002584 upg19446  5923 Jan 29 15:56 parser.c
+-rwxrwx---.  1  1002584 upg19446   717 Jan 28 20:02 parser.h
+-rwxrwx---.  1  1002584 upg19446   195 Jan 29 10:47 README.txt
+-rwxrwx---.  1  1002584 upg19446   991 Jan 29 14:11 signals.c
+-rwxrwx---.  1  1002584 upg19446   268 Jan 29 11:52 signals.h
+-rwx--x---.  1 francico upg19446 19496 Jan 29 15:56 smallsh

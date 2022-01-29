@@ -20,7 +20,7 @@ void handle_SIGTSTP(int signo) {
 		write(STDOUT_FILENO, "\nExiting foreground-only mode\n", 30);
 	}
 
-	siglongjmp(mark, -1);
+	//siglongjmp(mark, -1);
 }
 
 void fill_SIGTSTP_action(struct sigaction* SIGTSTP_action) {
