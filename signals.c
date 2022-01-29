@@ -7,12 +7,20 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <setjmp.h>
 #include "globalVariables.h"
 
 void handle_SIGTSTP(int signo) {
-	if (!flag) {
-		write(STDOUT_FILENO, "SIGTSTP\n", 8);
+	if (!foregroundOnlyMode) {
+		foregroundOnlyMode = 1;
+		write(STDOUT_FILENO, "\nEntering foreground-only mode (& is now ignored)\n", 50);
 	}
+	else {
+		foregroundOnlyMode = 0;
+		write(STDOUT_FILENO, "\nExiting foreground-only mode\n", 30);
+	}
+
+	siglongjmp(mark, -1);
 }
 
 void fill_SIGTSTP_action(struct sigaction* SIGTSTP_action) {

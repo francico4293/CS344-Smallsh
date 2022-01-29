@@ -4,6 +4,8 @@
 * Description: Header file for command execution and termination functions
 */
 
+void updateOperatingMode(int* operatingMode);
+
 void status(int exitStatus);
 
 void changeDirectory(struct command* command);

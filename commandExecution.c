@@ -15,6 +15,7 @@
 #include "dynamicArray.h"
 #include "parser.h"
 #include "signals.h"
+#include "globalVariables.h"
 
 void status(int exitStatus) {
 	if (WIFEXITED(exitStatus)) {
@@ -149,9 +150,10 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			redirectOutput(command, &savedOut, &restoreOut);
 		}
 
-		if (!command->backgroundProcess) {
+		if (!command->backgroundProcess || foregroundOnlyMode) {
 			signal(SIGINT, SIG_DFL);
 		}
+
 		struct sigaction ignoreAction = { 0 };
 		fill_ignoreAction(&ignoreAction);
 		sigaction(SIGTSTP, &ignoreAction, NULL);
@@ -164,7 +166,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		exit(1);
 	}
 	else {
-		if (!command->backgroundProcess) {
+		if (!command->backgroundProcess || foregroundOnlyMode) {
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			*lastStatus = childStatus;
 

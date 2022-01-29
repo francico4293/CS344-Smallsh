@@ -11,10 +11,12 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <setjmp.h>
 #include "dynamicArray.h"
 #include "parser.h"
 #include "commandExecution.h"
 #include "signals.h"
+#include "globalVariables.h"
 
 void cleanupMemory(struct command* command) {
 	int index = 0;
@@ -50,6 +52,7 @@ int main(void) {
 	sigaction(SIGTSTP, &SIGTSTP_action, NULL);
 
 	while (true) {
+		sigsetjmp(mark, 1);
 		terminateBackgroundProcesses(backgroundPids);
 
 		userInput = getCommandLineInput();
