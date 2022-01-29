@@ -35,7 +35,7 @@ int main(void) {
 	while (true) {
 		sigsetjmp(mark, 1);
 
-		terminateBackgroundProcesses(backgroundPids);
+		// terminateBackgroundProcesses(backgroundPids);
 
 		userInput = getCommandLineInput();
 
@@ -47,6 +47,8 @@ int main(void) {
 		}
 
 		executeCommand(command, backgroundPids, &lastStatus);
+
+		terminateBackgroundProcesses(backgroundPids);
 
 		cleanupMemory(command);
 	}
