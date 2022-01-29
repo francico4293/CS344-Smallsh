@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "signals.h"
 #include "globalVariables.h"
+#include "memory.h"
 
 void status(int exitStatus) {
 	if (WIFEXITED(exitStatus)) {
@@ -133,6 +134,12 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	}
 
 	if (strcmp(command->argv[0], "exit") == 0) {
+		cleanupMemory(command);
+
+		// close open Pids
+
+		free(backgroundPids->staticArray);
+		free(backgroundPids);
 		exit(0);
 	}
 

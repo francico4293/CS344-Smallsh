@@ -17,26 +17,7 @@
 #include "commandExecution.h"
 #include "signals.h"
 #include "globalVariables.h"
-
-void cleanupMemory(struct command* command) {
-	int index = 0;
-
-	while (command->argv[index]) {
-		free(command->argv[index]);
-		index++;
-	}
-	free(command->argv);
-
-	if (command->newInput) {
-		free(command->newInput);
-	}
-
-	if (command->newOutput) {
-		free(command->newOutput);
-	}
-
-	free(command);
-}
+#include "memory.h"
 
 int main(void) {
 	int lastStatus = 0;
@@ -53,6 +34,7 @@ int main(void) {
 
 	while (true) {
 		sigsetjmp(mark, 1);
+
 		terminateBackgroundProcesses(backgroundPids);
 
 		userInput = getCommandLineInput();
@@ -69,9 +51,9 @@ int main(void) {
 		cleanupMemory(command);
 	}
 
-	free(userInput);
-	free(backgroundPids->staticArray);
-	free(backgroundPids);
+	// free(userInput);
+	// free(backgroundPids->staticArray);
+	// free(backgroundPids);
 
 	return EXIT_SUCCESS;
 }
