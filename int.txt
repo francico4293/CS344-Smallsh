@@ -1,4 +1,0 @@
-   PID TTY          TIME CMD
-147461 pts/6    00:00:00 bash
-155679 pts/6    00:00:00 memcheck-amd64-
-155715 pts/6    00:00:00 ps
