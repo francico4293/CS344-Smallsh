@@ -179,8 +179,12 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		execvp(command->pathName, command->argv);
 
 		restoreIOStreams(restoreIn, savedIn, restoreOut, savedOut);
+
 		printf("%s: No such file or directory\n", command->pathName);
 		fflush(stdout);
+
+		cleanupMemoryAndExit(command, backgroundPids);
+
 		exit(1);
 	}
 	else {
