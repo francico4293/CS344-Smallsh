@@ -232,7 +232,10 @@ struct command* parseUserInput(char* userInput) {
 
 	if (lastToken && strcmp(lastToken, "&") == 0) {
 		command->backgroundProcess = true;
+
+		free(command->argv[lastTokenIndex]);
 		command->argv[lastTokenIndex] = NULL;
+
 		free(lastToken);
 	}
 	else if (lastToken) {
