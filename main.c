@@ -46,8 +46,6 @@ int main(void) {
 
 		executeCommand(command, backgroundPids, &lastStatus);
 
-		terminateBackgroundProcesses(backgroundPids);
-
 		cleanupMemory(command);
 	}
 

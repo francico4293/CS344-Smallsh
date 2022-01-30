@@ -115,6 +115,22 @@ void restoreIOStreams(bool restoreIn, int savedIn, bool restoreOut, int savedOut
 	}
 }
 
+void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
+	pid_t backgroundPid;
+	int backgroundPidStatus;
+
+	for (int index = 0; index < backgroundPids->size; index++) {
+		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) != 0) {
+			printf("background pid %d is done: ", backgroundPids->staticArray[index]);
+			fflush(stdout);
+
+			status(backgroundPidStatus);
+
+			delete(backgroundPids, index);
+		}
+	}
+}
+
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus) {
 	int childStatus;
 	pid_t spawnPid;
@@ -183,20 +199,6 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 			fflush(stdout);
 		}
 	}
-}
 
-void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
-	pid_t backgroundPid;
-	int backgroundPidStatus;
-
-	for (int index = 0; index < backgroundPids->size; index++) {
-		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) != 0) {
-			printf("background pid %d is done: ", backgroundPids->staticArray[index]);
-			fflush(stdout);
-
-			status(backgroundPidStatus);
-
-			delete(backgroundPids, index);
-		}
-	}
+	terminateBackgroundProcesses(backgroundPids);
 }
