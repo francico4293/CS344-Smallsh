@@ -40,7 +40,10 @@ void changeDirectory(struct command* command) {
 
 	getcwd(currentWorkingDir, PATH_MAX);
 	if (strncmp(command->argv[1], home, strlen(home)) == 0) {
-		chdir(command->argv[1]);
+		if (chdir(command->argv[1]) == -1) {
+			printf("%s: No such file or directory\n", command->argv[1]);
+			fflush(stdout);
+		}
 	}
 	else {
 		char* path = (char*)malloc((strlen(currentWorkingDir) + strlen("/") + strlen(command->argv[1]) + 1) * sizeof(char));
@@ -48,7 +51,11 @@ void changeDirectory(struct command* command) {
 		strcpy(path, currentWorkingDir);
 		strcat(path, "/");
 		strcat(path, command->argv[1]);
-		chdir(path);
+		
+		if (chdir(path) == -1) {
+			printf("%s: No such file or directory\n", command->argv[1]);
+			fflush(stdout);
+		}
 
 		free(path);
 	}
