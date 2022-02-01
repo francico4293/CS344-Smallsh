@@ -33,8 +33,6 @@ int main(void) {
 	sigaction(SIGTSTP, &SIGTSTP_action, NULL);
 
 	while (true) {
-		//sigsetjmp(mark, 1);
-
 		userInput = getCommandLineInput();
 
 		command = parseUserInput(userInput);
