@@ -1,7 +1,8 @@
 /*
 * Author: Colin Francis
 * ONID: francico
-* Descrtiption: Driver code for smallsh program
+* Title: Smallsh
+* Description: Driver code for smallsh program
 */
 #include <stdio.h>
 #include <stdlib.h>
