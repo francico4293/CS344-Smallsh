@@ -37,6 +37,9 @@ void status(int exitStatus) {
 	}
 }
 
+/*
+* Changes the current working directory based on a user specified path
+*/
 void changeDirectory(struct command* command) {
 	// declare a character array of size PATH_MAX
 	char currentWorkingDir[PATH_MAX];
@@ -232,6 +235,11 @@ void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
 	}
 }
 
+/*
+* First checks if the command to be executed is one of three built-in commands - status, cd, or exit - and if so, the appropriate built-in
+* command function is called to execute the built-in command. If the command to be executed is not a built-in command, then this function
+* will fork of a child process which executes the user specified shell script
+*/
 void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus) {
 	// declare a variable used to store the exit or termination status of a child process
 	int childStatus;
