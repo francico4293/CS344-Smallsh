@@ -1,6 +1,7 @@
 /*
 * Author: Colin Francis
 * ONID: francico
+* Title: Smallsh
 * Description: Functions associated with command excecution and termination
 */
 #include <stdlib.h>
@@ -18,49 +19,83 @@
 #include "globalVariables.h"
 #include "memory.h"
 
+/*
+* Prints the exit or termination status of a process based on the value in exitStatus
+*/
 void status(int exitStatus) {
+	// if WIFEXITED returns true, then the process was terminated normally
 	if (WIFEXITED(exitStatus)) {
+		// get and print the exit status via WEXITSTATUS 
 		printf("exit value %d\n", WEXITSTATUS(exitStatus));
-		fflush(stdout);
+		fflush(stdout);  // flush stdout
 	}
+	// if WIFEXITED didn't return true, then the process was terminated abnormally
 	else {
+		// get and print the signal number that caused the process to terminate via WTERMSIG
 		printf("terminated by signal %d\n", WTERMSIG(exitStatus));
-		fflush(stdout);
+		fflush(stdout);  // flush stdout
 	}
 }
 
 void changeDirectory(struct command* command) {
+	// declare a character array of size PATH_MAX
 	char currentWorkingDir[PATH_MAX];
+	// get the directory specified in the HOME environment variable and store it in a variable named home
 	char* home = getenv("HOME");
 
+	// argv[1] is NULL then the user only entered "cd"
 	if (!command->argv[1]) {
+		// chamge to the directory specified in the HOME environment variable
 		chdir(home);
-		return;
+		return;  // exit the function
 	}
 
+	// get the current working directory and store in the currentWorkingDir variable
 	getcwd(currentWorkingDir, PATH_MAX);
+	// if home is detected in the path specified by the user then the user is specifying an absolute path
 	if (strncmp(command->argv[1], home, strlen(home)) == 0) {
+		// since the path specified by the user is absolute, use chdir to change to the directory specified
+		// by the absolute path
 		if (chdir(command->argv[1]) == -1) {
+			// in the event that chdir returns -1, then the directory was not found - display an error message
+			// to the user
 			printf("%s: No such file or directory\n", command->argv[1]);
+			// flush stdout
 			fflush(stdout);
 		}
 	}
+	// if home is not detected in the path specified by the user then the user is specifying a relative path
 	else {
+		// to change to the correct directory, we need to concatenate the path in currentWorkingDir with the path specified 
+		// by the user and available in command->argv[1] - allocate memory large enough to hold the full path that must be 
+		// built
 		char* path = (char*)malloc((strlen(currentWorkingDir) + strlen("/") + strlen(command->argv[1]) + 1) * sizeof(char));
 
+		// copy the characters in currentWorkingDir into the memory segment allocated for path
 		strcpy(path, currentWorkingDir);
+		// concatenate path and "/"
 		strcat(path, "/");
+		// concatenate path and the path specified by the user which is available in command->argv[1]
 		strcat(path, command->argv[1]);
 		
+		// change to the directory specified by path
 		if (chdir(path) == -1) {
+			// in the event that chdir returns -1, then the directory was not found - display an error message
+			// to the user
 			printf("%s: No such file or directory\n", command->argv[1]);
+			// flush stdout
 			fflush(stdout);
 		}
 
+		// free the memory allocated for path
 		free(path);
 	}
 }
 
+/*
+* Redirects the input stream from stdin to the input stream specified by the user. In the event that the process being run is
+* a background process, the input stream will be redirected to "/dev/null"
+*/
 void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 	int targetInFD;
 
