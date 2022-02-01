@@ -280,90 +280,166 @@ char** appendArg(char* arg, char* argv[], int numArgs, int argvIndex) {
 	return newArgv;
 }
 
+/*
+* Fully parses the userInput string and sets / updates the appropriate members of the command struct
+* instance that is built for use in executing the user provided command
+*/
 struct command* parseUserInput(char* userInput) {
+	// declare and initialize a variable used to maintain the numbers of elements in the argv array
+	// of the command struct initialized below. Num args includes NULL as the last element in the argv
+	// array will always be NULL
 	int numArgs = 2;
+	// declare and initialize a variable used to maintain the index position to insert the next arg at
+	// in the argv array
 	int argvIndex = 0;
+	// declare and initialize a variable used to maintain the last token seen during parsing. This will be
+	// used to verify if the lastToken is "&" which will signal that the command should be run as a
+	// background process
 	char* lastToken = NULL;
+	// declare and initialize a variable used to maintain the index of where the lastToken exists in the argv
+	// array - this allows setting this element to NULL if lastToken is "&"
 	int lastTokenIndex = 0;
+	// declare and initialize a variable to maintain each token while parsing userInput
 	char* token = NULL;
+	// declare and initialize a variable to maintain the position in userInput while parsing
 	char* savePtr = NULL;
+	// allocate memory large enough to hold userInput plus an additional byte for the null character
 	char* userInputCopy = (char*)malloc((strlen(userInput) + 1) * sizeof(char));
+	// allocate memory large enough to hold the command struct
 	struct command* command = (struct command*)malloc(sizeof(struct command));
 
+	// parsing of userInput will effect userInput. In order to free this memory later, the original
+	// userInput address is preserved by copying the characters into userInputCopy for parsing
 	strcpy(userInputCopy, userInput);
 
+	// get the first token
 	token = strtok_r(userInputCopy, " ", &savePtr);
+	// if the first token is NULL, then the input was empty, if the first character in the first token
+	// is '#', then the user entered a comment - in either case we will just return the user back to the
+	// command prompt
 	if (!token || (*token == '#')) {
+		// free memory allocated by userInputCopy
 		free(userInputCopy);
+		// free memory allocated by command
 		free(command);
+		// return a NULL pointer
 		return NULL;
 	}
 
+	// initialize the command struct which will hold components of the parsed userInput
 	initializeCommandStruct(command, numArgs);
 
+	// the first token will be the actual command provided by the user and will also be executed by using
+	// the PATH variable if the command is not a built-in command - allocate memory for the pathName 
+	// attribute large enough for the first token plus an additional byte for the null character
 	command->pathName = (char*)malloc((strlen(token) + 1) * sizeof(char));
+	// copy the characters of token into the memory segment allocated for pathName
 	strcpy(command->pathName, token);
 
+	// the first element of argv will also be the command provided by the user based on later usage of
+	// execvp. Set argv[0] equal to the same memory segment that the pathName attribute is equal to
 	command->argv[argvIndex] = command->pathName;
+	// increment argvIndex by 1
 	argvIndex++;
 
+	// get the second token
 	token = strtok_r(NULL, " ", &savePtr);
+	// continue parsing userInput until everything has been parsed - when this happens, token will be NULL
 	while (token) {
+		// this if statement is being used to maintain the lastToken found as well as what index position
+		// it was found at. After the while loop breaks a conditional check will be made against lastToken.
+		// If lastToken is '&' then the command will need to be run in the background and the lastToken will
+		// be replaced with NULL
 		if (strcmp(token, " ") != 0) {
+			// if lastToken is not NULL
 			if (lastToken) {
+				// free memory segment stored in lastToken before allocating any new memory
 				free(lastToken);
 			}
 
+			// allocate memory large enough to store the current token plus an additional byte for the NULL
+			// character
 			lastToken = (char*)malloc((strlen(token) + 1) * sizeof(char));
+			// update lastTokenIndex to be equal to the current value in argvIndex
 			lastTokenIndex = argvIndex;
+			// copy the characters in token into the memory segment maintained by lastToken
 			strcpy(lastToken, token);
 		}
 
+		// if a '<' character is encountered then the user has specified input redirection
 		if (strcmp(token, "<") == 0) {
+			// set the inputRedirect attribute to true
 			command->inputRedirect = true;
 
+			// get the next token since the next token following '<' will be the location to redirect input from
 			token = strtok_r(NULL, " ", &savePtr);
+			// parse the current token to expand any instances of "$$"
 			token = parseArg(token);
+			// allocate memory large enough to hold the current token plus an additional byte for the NULL
+			// character
 			command->newInput = (char*)malloc((strlen(token) + 1) * sizeof(char));
 
+			// copy the characters in token into the memory segment allocated for the newInput attribute
 			strcpy(command->newInput, token);
 
+			// free the memory allocated for token
 			free(token);
 		}
 		else if (strcmp(token, ">") == 0) {
+			// set the outputRedirect attribute to true
 			command->outputRedirect = true;
 
+			// get the next token since the next token following '>' will be the location to redirect output to
 			token = strtok_r(NULL, " ", &savePtr);
+			// parse the current token to expand any instances of "$$"
 			token = parseArg(token);
+			// allocate memory large enough to hold the current token plus an additional byte for the NULL
+			// character
 			command->newOutput = (char*)malloc((strlen(token) + 1) * sizeof(char));
 
+			// copy the characters in token into the memory segment allocated for the newOutput attribute
 			strcpy(command->newOutput, token);
 
+			// free the memory allocated for token
 			free(token);
 		}
 		else {
+			// append the current token to the argv array attribute at the index position specified by argvIndex
 			command->argv = appendArg(token, command->argv, numArgs, argvIndex);
+			// increment argvIndex by one
 			argvIndex++;
+			// increment numArgs by one
 			numArgs++;
 		}
 
+		// get the next token
 		token = strtok_r(NULL, " ", &savePtr);
 	}
 
+	// if lastToken is equal to "&" then the command will need to be run as a background process
 	if (lastToken && strcmp(lastToken, "&") == 0) {
+		// set the backgroundProcess attribute of the command struct to true
 		command->backgroundProcess = true;
 
+		// free the memory segment represented by the address in argv[lastTokenIndex]
 		free(command->argv[lastTokenIndex]);
+		// set argv[lastTokenIndex] to NULL
 		command->argv[lastTokenIndex] = NULL;
 
+		// free the memory segment represented by the address in lastToken
 		free(lastToken);
 	}
+	// if lastToken isn't equal to "&" we still need to free the memory segment
 	else if (lastToken) {
+		// free memory allocated for lastToken
 		free(lastToken);
 	}
 
+	// free memory allocated for userInput
 	free(userInput);
+	// free memory allocated for userInputCopy
 	free(userInputCopy);
 
+	// return the address of the fully populated command struct
 	return command;
 }
