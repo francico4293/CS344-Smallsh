@@ -4,9 +4,7 @@ echo "PRE-SCRIPT INFO"
 echo "  Grading Script PID: $$"
 echo '  Note: your smallsh will report a different PID when evaluating $$'
 
-while true
-do
-./smallsh >> testResuls.txt <<'___EOF___'
+./smallsh <<'___EOF___'
 echo BEGINNING TEST SCRIPT
 echo
 echo --------------------
@@ -108,21 +106,5 @@ date
 sleep 5 &
 date
 kill -SIGTSTP $$
-echo --------------------
-echo Cleaning up directories & exiting
-cd ..
-echo
-echo
-echo --------------------
-echo pwd
-pwd
-echo
-echo
-echo --------------------
-echo rmdir testdir$$
-rmdir testdir$$
 exit
 ___EOF___
-sleep 120
-done
-
