@@ -50,7 +50,9 @@ void cleanupMemory(struct command* command) {
 * the dynamic array used to track runnning background processes
 */
 void cleanupMemoryAndExit(struct command* command, struct dynamicArray* backgroundPids) {
+	// declare a variable used to store a process id
 	pid_t backgroundPid;
+	// declare a variable used to store the status of a process
 	int backgroundPidStatus;
 
 	// release memory allocated for the command struct and its members
