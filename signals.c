@@ -44,7 +44,6 @@ void fill_SIGTSTP_action(struct sigaction* SIGTSTP_action) {
 	SIGTSTP_action->sa_flags = SA_RESTART;
 	// set sa_mask attribute so that all signals are blocked while the signal handler is executing
 	sigfillset(&(SIGTSTP_action->sa_mask));
-	// sigdelset(&(SIGTSTP_action->sa_mask), SIGINT);
 }
 
 /*

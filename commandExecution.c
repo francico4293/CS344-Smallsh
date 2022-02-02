@@ -49,7 +49,12 @@ void changeDirectory(struct command* command) {
 	// argv[1] is NULL then the user only entered "cd"
 	if (!command->argv[1]) {
 		// chamge to the directory specified in the HOME environment variable
-		chdir(home);
+		if (chdir(home) == -1) {
+			// in the even that chdir fails to go home, display an error message to the user
+			printf("%s: Unable to go to home directory");
+			// flush stdout
+			fflush(stdout);
+		}
 		return;  // exit the function
 	}
 
@@ -137,7 +142,7 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 	// if inResult is -1, then dup2 failed
 	if (inResult == -1) {
 		// display an error message to the user
-		perror("dup2");
+		perror("dup2 failed");
 		// exit with status 1
 		exit(1);
 	}
@@ -185,7 +190,7 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
 	// if outResult is -1, then dup2 failed
 	if (outResult == -1) {
 		// display an error message to the user
-		perror("dup2");
+		perror("dup2 failed");
 		// exit with status 1
 		exit(1);
 	}
@@ -198,13 +203,25 @@ void restoreIOStreams(bool restoreIn, int savedIn, bool restoreOut, int savedOut
 	// if restoreIn is true
 	if (restoreIn) {
 		// restore input stream back to STDIN_FILENO
-		dup2(savedIn, STDIN_FILENO);
+		int inResult = dup2(savedIn, STDIN_FILENO);
+		if (inResult == -1) {
+			// display an error message to the user
+			perror("dup2 failed");
+			// exit with status 1
+			exit(1);
+		}
 	}
 
 	// if restoreOut is true
 	if (restoreOut) {
 		// restore output stream back to STDOUT_FILENO
-		dup2(savedOut, STDOUT_FILENO);
+		int outResult = dup2(savedOut, STDOUT_FILENO);
+		if (outResult == -1) {
+			// display an error message to the user
+			perror("dup2 failed");
+			// exit with status 1
+			exit(1);
+		}
 	}
 }
 
@@ -212,7 +229,9 @@ void restoreIOStreams(bool restoreIn, int savedIn, bool restoreOut, int savedOut
 * Terminates any background processes that have completed
 */
 void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
+	// declare a variable used to hold a process id
 	pid_t backgroundPid;
+	// declare a variable used to hold the status of a background process
 	int backgroundPidStatus;
 
 	// iterate over each background pid in the backgroundPids array
@@ -285,7 +304,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 	// if spawnPid is -1, then fork failed
 	if (spawnPid == -1) {
 		// display error message to the user
-		perror("fork");
+		perror("fork failed");
 		// exit with status 1
 		exit(1);
 	}
