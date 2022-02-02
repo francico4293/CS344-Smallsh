@@ -104,7 +104,7 @@ void changeDirectory(struct command* command) {
 * Redirects the input stream from stdin to the input stream specified by the user. In the event that the process being run is
 * a background process, the input stream will be redirected to "/dev/null"
 */
-void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
+void redirectInput(struct command* command, int* savedIn, bool* restoreIn, struct dynamicArray* backgroundPids) {
 	// declare a variable that will store the file descriptor associated with where the input file stream will be redirected
 	int targetInFD;
 
@@ -133,6 +133,8 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 		printf("%s: No such file or directory\n", command->newInput);
 		// flush stdout
 		fflush(stdout);
+		// cleanup memory and terminate any background processes
+		cleanupMemoryAndExit(command, backgroundPids);
 		// exit with status 1
 		exit(1);
 	}
@@ -143,6 +145,8 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 	if (inResult == -1) {
 		// display an error message to the user
 		perror("dup2 failed");
+		// cleanup memory and terminate any background processes
+		cleanupMemoryAndExit(command, backgroundPids);
 		// exit with status 1
 		exit(1);
 	}
@@ -152,7 +156,7 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn) {
 * Redirects the output stream from stdout to the output stream specified by the user. In the event that the process being run is
 * a background process, the output stream will be redirected to "/dev/null"
 */
-void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
+void redirectOutput(struct command* command, int* savedOut, bool* restoreOut, struct dynamicArray* backgroundPids) {
 	// declare a variable that will store the file descriptor associated with where the output file stream will be redirected
 	int targetOutFD;
 
@@ -178,9 +182,11 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
 	// if targetOutFD is -1, then open failed
 	if (targetOutFD == -1) {
 		// display an error message to the user
-		printf("%s: No such file or directory\n", command->newInput);
+		printf("%s: No such file or directory\n", command->newOutput);
 		// flush stdout
 		fflush(stdout);
+		// cleanup memory and terminate any background processes
+		cleanupMemoryAndExit(command, backgroundPids);
 		// exit with status 1
 		exit(1);
 	}
@@ -191,6 +197,8 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut) {
 	if (outResult == -1) {
 		// display an error message to the user
 		perror("dup2 failed");
+		// cleanup memory and terminate any background processes
+		cleanupMemoryAndExit(command, backgroundPids);
 		// exit with status 1
 		exit(1);
 	}
@@ -313,13 +321,13 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		// if inputRedirect is true or the command is flagged as being a background process
 		if (command->inputRedirect || command->backgroundProcess) {
 			// redirect input stream
-			redirectInput(command, &savedIn, &restoreIn);
+			redirectInput(command, &savedIn, &restoreIn, backgroundPids);
 		}
 
 		// if output redirect is true or the command is flagged as being a background process
 		if (command->outputRedirect || command->backgroundProcess) {
 			// redirect output stream
-			redirectOutput(command, &savedOut, &restoreOut);
+			redirectOutput(command, &savedOut, &restoreOut, backgroundPids);
 		}
 
 		// if the command to be executed is not a background process or foregroundOnlyMode is set to 1, then

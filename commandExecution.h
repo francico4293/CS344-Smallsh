@@ -19,13 +19,13 @@ void changeDirectory(struct command* command);
 * Redirects the input stream from stdin to the input stream specified by the user. In the event that the process being run is
 * a background process, the input stream will be redirected to "/dev/null"
 */
-void redirectInput(struct command* command, int* savedIn, bool* restoreIn);
+void redirectInput(struct command* command, int* savedIn, bool* restoreIn, struct dynamicArray* backgroundPids);
 
 /*
 * Redirects the output stream from stdout to the output stream specified by the user. In the event that the process being run is
 * a background process, the output stream will be redirected to "/dev/null"
 */
-void redirectOutput(struct command* command, int* savedOut, bool* restoreOut);
+void redirectOutput(struct command* command, int* savedOut, bool* restoreOut, struct dynamicArray* backgroundPids);
 
 /*
 * Restores I/O streams stored in savedIn and savedOut
