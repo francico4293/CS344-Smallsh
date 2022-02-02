@@ -6,12 +6,16 @@
 */
 
 /*
-* A signal handler for the SIGTSTP signal. This signal handler will check the forgroundOnlyMode global
-* variable - if it is 1, the signal handler will change its value to 0; if it is 0, the signal handler
-* will change its value to 1. A forgroundOnlyMode value of 1 signifies that the shell is in foreground
-* only mode. A foregroundOnlyMode value of 0 signifies that the shell is not in foreground only mode
+* A signal handler for SIGTSTP signal - this signal handler will cause the shell to enter into foreground
+* only mode where '&' associated with background processes will be ignored
 */
-void handle_SIGTSTP(int signo);
+void foregroundOn(int signo);
+
+/*
+* A signal handler for SIGTSTP signal - this signal handler will cause the shell to exit foreground only
+* mode where '&' while result in a process running in the background
+*/
+void foregroundOff(int signo);
 
 /*
 * Populates the sigaction struct used to register the signal handler for the SIGTSTP signal
