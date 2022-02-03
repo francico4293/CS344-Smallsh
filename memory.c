@@ -62,8 +62,8 @@ void cleanupMemoryAndExit(struct command* command, struct dynamicArray* backgrou
 	for (int index = 0; index < backgroundPids->size; index++) {
 		// if this statement returns zero, then the background process is still running
 		if ((backgroundPid = waitpid(backgroundPids->staticArray[index], &backgroundPidStatus, WNOHANG)) == 0) {
-			// kill the running background process
-			kill(backgroundPids->staticArray[index], SIGKILL);
+			// terminate the running background process
+			kill(backgroundPids->staticArray[index], SIGTERM);
 		}
 	}
 

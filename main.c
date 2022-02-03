@@ -89,7 +89,7 @@ int main(void) {
 	// declare and initialize sigaction structs ignore_action and SIGTSTP_action for use in
 	// signal handling
 	struct sigaction ignore_action = { 0 }, SIGTSTP_action = { 0 };
-
+		
 	// populate the ignore_action struct
 	fill_ignore_action(&ignore_action);
 	// register the ignore_action struct with SIGINT
@@ -103,11 +103,11 @@ int main(void) {
 	// continue capture user input and executing the provided commands until the user exits the
 	// program via the "exit" command
 	while (true) {
-		// if signal handler has set foreground only mode on, then update local flag
+		// if signal handler has set foreground only mode on, then update local flag (reference citation A)
 		if (foregroundOnlyMode) {
 			foregroundFlag = 1;
 		}
-		// if signal handler has set foreground only mode off, then update local flag
+		// if signal handler has set foreground only mode off, then update local flag (reference citation A)
 		else {
 			foregroundFlag = 0;
 		}

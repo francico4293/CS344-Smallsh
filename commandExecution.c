@@ -13,6 +13,7 @@
 #include <string.h>
 #include <limits.h>
 #include <signal.h>
+#include <errno.h>
 #include "dynamicArray.h"
 #include "parser.h"
 #include "signals.h"
