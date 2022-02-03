@@ -2,7 +2,7 @@
 * Author: Colin Francis
 * ONID: francico
 * Title: Smallsh
-* Description: Functions associated with signal handling
+* Description: Functions associated with populating sigaction structs
 */
 #include <signal.h>
 #include <unistd.h>

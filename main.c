@@ -6,12 +6,8 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <signal.h>
 #include <errno.h>
 #include "dynamicArray.h"
@@ -21,7 +17,8 @@
 #include "memory.h"
 
 // A variable used to maintain a 0 or 1 value associated with the shell being in foreground
-// only mode or not - 1 = foregroundOnlyMode, 0 = !foregroundOnlyMode
+// only mode or not  1 = foregroundOnlyMode, 0 = !foregroundOnlyMode - this variable is used
+// for the signal handlers to update as SIGTSTP is received
 // Reference citation A
 static volatile sig_atomic_t foregroundOnlyMode = 0;
 
