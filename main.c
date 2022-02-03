@@ -17,7 +17,6 @@
 #include "parser.h"
 #include "commandExecution.h"
 #include "signals.h"
-#include "globalVariables.h"
 #include "memory.h"
 
 /*

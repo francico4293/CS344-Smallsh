@@ -16,7 +16,6 @@
 #include "dynamicArray.h"
 #include "parser.h"
 #include "signals.h"
-#include "globalVariables.h"
 #include "memory.h"
 
 /*
