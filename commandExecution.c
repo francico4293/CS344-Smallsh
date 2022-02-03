@@ -47,7 +47,7 @@ void changeDirectory(struct command* command) {
 
 	// argv[1] is NULL then the user only entered "cd"
 	if (!command->argv[1]) {
-		// chamge to the directory specified in the HOME environment variable
+		// change to the directory specified in the HOME environment variable
 		if (chdir(home) == -1) {
 			// in the even that chdir fails to go home, display an error message to the user
 			printf("%s: Unable to go to home directory");

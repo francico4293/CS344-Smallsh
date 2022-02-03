@@ -36,7 +36,7 @@ char* getCommandLineInput(void) {
 	// for use with getline
 	ssize_t nread;
 
-	// diplsay ":" as command line prompt
+	// display ":" as command line prompt
 	printf(": ");
 	// use getline to capture user input from stdin and store in userInput variable
 	nread = getline(&userInput, &length, stdin);
