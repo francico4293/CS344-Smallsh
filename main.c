@@ -120,6 +120,8 @@ int main(void) {
 
 		// if command is a NULL pointer then the user entered a blank line or a comment - ignore this
 		if (!command) {
+			// check for any completed background processes and clean them up
+			terminateBackgroundProcesses(backgroundPids);
 			// free memory segment in userInput
 			free(userInput);
 			// return user back to the command prompt ":" and await input
