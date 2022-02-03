@@ -168,7 +168,7 @@ char* parseArg(char* arg) {
 	char* finalExpandedArg = NULL;
 	// declare and initialize a variable that will maintain the current expanded argument state
 	char* currExpandedArg = NULL;
-	// declare and initialize a variable that stores the number of digits in the pid of smallsh
+	// declare and initialize a variable that stores the number of digits in the pid of smallsh (reference citation E)
 	int pidLength = snprintf(NULL, 0, "%d", getpid());
 	// allocate memory large enough to hold characters equal to the length of the pid of smallsh
 	// plus a null character

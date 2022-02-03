@@ -12,16 +12,19 @@
 
 // A variable used to maintain a 0 or 1 value associated with the shell being in foreground
 // only mode or not - 1 = foregroundOnlyMode, 0 = !foregroundOnlyMode
+// Reference citation A
 volatile sig_atomic_t foregroundOnlyMode = 0;
 
 /*
 * Function definition for foregroundOff signal handler
+* Reference citation A
 */
 void foregroundOff(int signo);
 
 /*
 * A signal handler for SIGTSTP signal - this signal handler will cause the shell to enter into foreground
 * only mode where '&' associated with background processes will be ignored
+* Reference citation A
 */
 void foregroundOn(int signo) {
 	// save errno
@@ -42,6 +45,7 @@ void foregroundOn(int signo) {
 /*
 * A signal handler for SIGTSTP signal - this signal handler will cause the shell to exit foreground only 
 * mode where '&' while result in a process running in the background
+* Reference citation A
 */
 void foregroundOff(int signo) {
 	// save errno

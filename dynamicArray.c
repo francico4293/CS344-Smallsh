@@ -8,6 +8,7 @@
 
 /*
 * A struct representing a dynamic array
+* Reference citations B, C, D
 */
 struct dynamicArray {
 	int size;  // the number of elements currently in the dynamic array
@@ -19,6 +20,7 @@ struct dynamicArray {
 * Increases the capacity of the dynamic array by 2x its current size. A new underlying static array
 * with this increased capacity is created and all elements in the current static array are transferred
 * into the new static array
+* Reference citations B, C, D
 */
 void upsizeArray(struct dynamicArray* dynArr) {
 	// allocate memory for a new static array whose capacity is 2x the current capacity
@@ -40,6 +42,7 @@ void upsizeArray(struct dynamicArray* dynArr) {
 
 /*
 * Deletes the element at the specified index from the dynamic array
+* Reference citations B, C, D
 */
 void delete(struct dynamicArray* dynArr, int indexToDelete) {
 	// declare and initialize a variable to track the current index position to add values at in the
@@ -73,6 +76,7 @@ void delete(struct dynamicArray* dynArr, int indexToDelete) {
 
 /*
 * Add the specified value to the end of the dynamic array
+* Reference citations B, C, D
 */
 void append(struct dynamicArray* dynArr, int value) {
 	// if the ratio of elements in the array to array capacity is greater than or equal to 0.75, then
@@ -89,6 +93,7 @@ void append(struct dynamicArray* dynArr, int value) {
 
 /*
 * Creates a new instance of a dynamic array
+* Reference citations B, C, D
 */
 struct dynamicArray* newDynamicArray(void) {
 	// allocate memory for a new static array struct

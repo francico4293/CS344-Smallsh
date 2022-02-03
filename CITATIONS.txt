@@ -1,1 +1,35 @@
-https://edstem.org/us/courses/16718/discussion/1067170
+// Citations:
+// Note: References to the following citations are placed at appropriate points throughout the code found in main.c, 
+//	commandExecution.c, memory.c, parser.c, signals.c, and dynamicArray.c. Please refer back to this section when 
+//	necessary.
+//
+// Citation A
+// Date: 2/2/2022
+// Based on and adapted from source URL: https://edstem.org/us/courses/16718/discussion/1067170
+//
+// Citation B
+// Date: 1/27/2022
+// Based on and adapted from:
+//		Author: Colin Francis
+//		Program title: Assignment 2: Dynamic Array and ADTs Implementation
+//		Source: This is the program I submitted for assignment 2 in CS261 - Data Structures. Source code can be provided
+//				upon request
+//		Type: Source code
+//
+// Citation C
+// Date: 1/27/2022
+// Based on and adapted from source URL: https://canvas.oregonstate.edu/courses/1822056/pages/exploration-dynamic-arrays?module_item_id=21198593
+// Note about source URL: This was the exploration about Dynamic Arrays provided via Oregon State University's CS261 Data Structures course
+//
+// Citation D
+// Date: 1/27/2022
+// Based on and adapted from:
+//		Author: Colin Francis
+//		Program Title: Assignment 2: Files and Directories
+//		Source: I implemented a dynamic array as part of assignment 2 that was a useful reference in building the
+//			dynamic array built for Smallsh. Source code can be provided upon request
+//		Type: Source code
+//
+// Citation E
+// Date: 1/27/2022
+// Based on source URL: https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/snprintf-snprintf-snprintf-l-snwprintf-snwprintf-l?view=msvc-170
