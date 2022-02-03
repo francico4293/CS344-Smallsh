@@ -7,7 +7,7 @@
 
 // A variable used to maintain a 0 or 1 value associated with the shell being in foreground
 // only mode or not - 1 = foregroundOnlyMode, 0 = !foregroundOnlyMode
-volatile sig_atomic_t foregroundOnlyMode;
+static volatile sig_atomic_t foregroundOnlyMode;
 
 /*
 * A signal handler for SIGTSTP signal - this signal handler will cause the shell to enter into foreground

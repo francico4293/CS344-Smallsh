@@ -13,7 +13,7 @@
 // A variable used to maintain a 0 or 1 value associated with the shell being in foreground
 // only mode or not - 1 = foregroundOnlyMode, 0 = !foregroundOnlyMode
 // Reference citation A
-volatile sig_atomic_t foregroundOnlyMode = 0;
+static volatile sig_atomic_t foregroundOnlyMode = 0;
 
 /*
 * Function definition for foregroundOff signal handler
