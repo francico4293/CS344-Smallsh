@@ -40,7 +40,7 @@ void status(int exitStatus) {
 * Changes the current working directory based on a user specified path
 */
 void changeDirectory(struct command* command) {
-	// declare a character array of size PATH_MAX
+	// declare a character array of size PATH_MAX (reference citation H)
 	char currentWorkingDir[PATH_MAX];
 	// get the directory specified in the HOME environment variable and store it in a variable named home
 	char* home = getenv("HOME");
@@ -108,7 +108,7 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn, struc
 	int targetInFD;
 
 	// set the integer at the address in savedIn equal to the value returned by dup(STDIN_FILENO), this will allow restoration of
-	// stdin after the command has been executed
+	// stdin after the command has been executed (reference citation G)
 	*savedIn = dup(STDIN_FILENO);
 	// set the value at the address in restoreIn equal to true - this signifies that the original input stream must be restored after
 	// command execution
@@ -160,7 +160,7 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut, st
 	int targetOutFD;
 
 	// set the integer at the address in savedOut equal to the value returned by dup(STDOUT_FILENO), this will allow restoration of
-	// stdout after the command has been executed
+	// stdout after the command has been executed (reference citation G)
 	*savedOut = dup(STDOUT_FILENO);
 	// set the value at the address in restoreOut equal to true - this signifies that the original output stream must be restored after
 	// command execution
@@ -205,6 +205,7 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut, st
 
 /*
 * Restores I/O streams stored in savedIn and savedOut
+* Reference citation G
 */
 void restoreIOStreams(bool restoreIn, int savedIn, bool restoreOut, int savedOut) {
 	// if restoreIn is true
@@ -305,6 +306,8 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		// exit with status 0
 		exit(0);
 	}
+
+	// For the following code structure, reference citation F
 
 	// fork a child process and store the return value in spawnPid variable
 	spawnPid = fork();

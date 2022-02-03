@@ -33,3 +33,17 @@
 // Citation E
 // Date: 1/27/2022
 // Based on source URL: https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/snprintf-snprintf-snprintf-l-snwprintf-snwprintf-l?view=msvc-170
+//
+// Citation F
+// Date: 1/26/2022
+// Based on and adapted from source URL: https://canvas.oregonstate.edu/courses/1884946/pages/exploration-process-api-monitoring-child-processes?module_item_id=21835973
+// Note: Shell command execution code in commandExecution.c was based on the examples provided in the exploration given by the above URL
+//
+// Citation G
+// Date: 1/26/2022
+// Based on source URL: https://stackoverflow.com/questions/11042218/c-restore-stdout-to-terminal
+//
+// Citation H
+// Date: 1/27/2022
+// Based on source URL: https://stackoverflow.com/questions/9449241/where-is-path-max-defined-in-linux
+// Note: Discovered PATH_MAX via this source
