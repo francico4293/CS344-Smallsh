@@ -42,4 +42,4 @@ void terminateBackgroundProcesses(struct dynamicArray* backgroundPids);
 * command function is called to execute the built-in command. If the command to be executed is not a built-in command, then this function
 * will fork of a child process which executes the user specified shell script
 */
-void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus);
+void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus, int foregroundFlag);

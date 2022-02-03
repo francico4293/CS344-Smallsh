@@ -267,7 +267,7 @@ void terminateBackgroundProcesses(struct dynamicArray* backgroundPids) {
 * command function is called to execute the built-in command. If the command to be executed is not a built-in command, then this function
 * will fork of a child process which executes the user specified shell script
 */
-void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus) {
+void executeCommand(struct command* command, struct dynamicArray* backgroundPids, int* lastStatus, int foregroundFlag) {
 	// declare a variable used to store the exit or termination status of a child process
 	int childStatus;
 	// declare a variable used to store the pid of a forked child process
@@ -335,7 +335,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		// if the command to be executed is not a background process or foregroundOnlyMode is set to 1, then
 		// the command is going to be a foreground process and should terminate itself upon receiving SIGINT
 		// from the OS - restore SIGINT back to it's default
-		if (!command->backgroundProcess || foregroundOnlyMode) {
+		if (!command->backgroundProcess || foregroundFlag) {
 			signal(SIGINT, SIG_DFL);
 		}
 
@@ -370,7 +370,7 @@ void executeCommand(struct command* command, struct dynamicArray* backgroundPids
 		// if the child process being executed is not a background process or if foregroundOnlyMode is set to 1,
 		// then the child process will  be executed in the foreground and the parent must wait for the child to
 		// terminate before continuing
-		if (!command->backgroundProcess || foregroundOnlyMode) {
+		if (!command->backgroundProcess || foregroundFlag) {
 			// user waitpid with the spawnPid to wait for the child process to terminate
 			spawnPid = waitpid(spawnPid, &childStatus, 0);
 			// set the value of the address in lastStatus equal to the value in childStatus - this will be used to
