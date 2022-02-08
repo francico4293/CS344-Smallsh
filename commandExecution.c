@@ -130,7 +130,7 @@ void redirectInput(struct command* command, int* savedIn, bool* restoreIn, struc
 	// if targetInFD is -1, then open failed
 	if (targetInFD == -1) {
 		// display an error message to the user
-		printf("%s: No such file or directory\n", command->newInput);
+		printf("Cannot open %s for input\n", command->newInput);
 		// flush stdout
 		fflush(stdout);
 		// cleanup memory and terminate any background processes
@@ -182,7 +182,7 @@ void redirectOutput(struct command* command, int* savedOut, bool* restoreOut, st
 	// if targetOutFD is -1, then open failed
 	if (targetOutFD == -1) {
 		// display an error message to the user
-		printf("%s: No such file or directory\n", command->newOutput);
+		printf("Cannot open %s for output\n", command->newOutput);
 		// flush stdout
 		fflush(stdout);
 		// cleanup memory and terminate any background processes
